@@ -1,0 +1,593 @@
+<div class="flex h-screen w-full overflow-hidden bg-slate-50/80 font-sans text-slate-800">
+
+    <!-- ==================== SIDEBAR IZQUIERDO (ALTO FIJO 100%) ==================== -->
+    <aside class="w-64 h-full bg-white border-r border-slate-200/80 flex flex-col justify-between shrink-0 z-20 p-4">
+
+        <div class="space-y-6">
+            <!-- Logo Clínica -->
+            <div class="flex items-center gap-2.5 px-2 pt-1">
+                <div
+                    class="w-9 h-9 rounded-xl bg-[#005c53] flex items-center justify-center text-white text-lg font-bold shadow-md shadow-[#005c53]/20">
+                    🐾
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-900 text-sm leading-none">Pariona</h3>
+                    <p class="text-[9px] font-bold text-teal-800 tracking-wider uppercase mt-0.5">PORTAL PROPIETARIO</p>
+                </div>
+            </div>
+
+            <!-- Tarjeta Usuario Logueado -->
+            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-sm flex items-center justify-center border border-emerald-200">
+                    M
+                </div>
+                <div class="overflow-hidden">
+                    <h4 class="text-xs font-bold text-slate-900 truncate">Familia Morales</h4>
+                    <p class="text-[10px] text-slate-500 font-medium">2 Mascotas Registradas</p>
+                </div>
+            </div>
+
+            <!-- Menú de Navegación -->
+            <nav class="space-y-1">
+                <!-- Item Activo -->
+                <a routerLink="/dashboard"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#005c53] text-white font-bold text-xs shadow-md shadow-[#005c53]/20 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span>Inicio / Resumen</span>
+                </a>
+
+                <a routerLink="/mascotas"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    <span>Mis Mascotas</span>
+                </a>
+
+                <a routerLink="/citas"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Citas y Consultas</span>
+                </a>
+
+                <a routerLink="/historial"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Historial Médico</span>
+                </a>
+
+                <a routerLink="/vacunas"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L5.6 15.11a2 2 0 00-1.637.518l-.948.948a2 2 0 000 2.828l1.414 1.414a2 2 0 002.828 0l.948-.948a2 2 0 00.518-1.637l-.536-2.387a6 6 0 01.517-3.86l.158-.318a6 6 0 00.517-3.86L8.528 5.6a2 2 0 00.518-1.637l.948-.948a2 2 0 002.828 0l1.414 1.414a2 2 0 000 2.828l-.948.948a2 2 0 00-.518 1.637l.536 2.387a6 6 0 01-.517 3.86l-.158.318a6 6 0 00-.517 3.86l.477 2.387c.09.45.28.87.547 1.022z" />
+                    </svg>
+                    <span>Vacunas y Tratamientos</span>
+                </a>
+
+                <a routerLink="/pagos"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Pagos / Comprobantes</span>
+                </a>
+
+                <a routerLink="/configuracion"
+                    class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sección Inferior: Emergencias y Salir -->
+        <div class="space-y-3 pt-4 border-t border-slate-100">
+        
+
+            <a (click)="cerrarSesion()"
+                class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- ==================== CONTENIDO PRINCIPAL SCROLLABLE ==================== -->
+    <div class="flex-1 h-full overflow-y-auto flex flex-col">
+
+        <!-- Top Header Bar (Sticky al scroll del panel derecho) -->
+        <header
+            class="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-6 py-3 flex items-center justify-between shrink-0">
+
+            <!-- Buscador -->
+            <div class="relative w-72 sm:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </span>
+                <input type="text" placeholder="Buscar mascota, vacuna, doctor..."
+                    class="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100/70 border border-transparent focus:border-teal-600 focus:bg-white text-xs outline-none transition-all placeholder-slate-400" />
+            </div>
+
+            <!-- Acciones de Usuario -->
+            <div class="flex items-center gap-3">
+
+
+                <button
+                    class="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 relative transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500"></span>
+                </button>
+
+                <div class="h-6 w-px bg-slate-200"></div>
+
+                <div class="flex items-center gap-2">
+                    <div class="text-right hidden sm:block">
+                        <h5 class="text-xs font-bold text-slate-900 leading-none">
+                            {{ usuarioActual()?.nombres }} {{ usuarioActual()?.apellidos }}
+                        </h5>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Sede Central Los Olivos</p>
+                    </div>
+                    <div
+                        class="w-8 h-8 rounded-full bg-teal-800 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm">
+                        👩‍⚕️
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Cuerpo del Dashboard -->
+        <div class="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full flex-1">
+
+            <!-- 1. Hero Banner de Bienvenida -->
+            <div
+                class="relative bg-linear-to-r from-[#005c53] via-[#004841] to-teal-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-[#005c53]/15 overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="space-y-3 max-w-2xl relative z-10">
+                    <span
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        SEDE CENTRAL SAN BORJA • ABIERTO 24/7
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        ¡Hola, {{ usuarioActual()?.nombres }}! Nos alegra verte de nuevo 👋
+                    </h1>
+                    <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
+                        Aquí tienes el estado de salud, citas y recordatorios preventivos de tus compañeros <strong
+                            class="text-white">Simba y Milo</strong>.
+                    </p>
+                </div>
+
+                <button
+                    class="shrink-0 bg-white hover:bg-slate-50 text-[#005c53] font-extrabold text-xs px-5 py-3 rounded-2xl shadow-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 relative z-10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Solicitar nueva cita veterinaria
+                </button>
+            </div>
+
+            <!-- 2. Grid de Resumen de Métricas (4 Tarjetas) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                <!-- Card 1 -->
+                <div
+                    class="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">MASCOTAS
+                            REGISTRADAS</span>
+                        <div
+                            class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center text-sm">
+                            🐾</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-slate-900">2</span>
+                            <span class="text-xs font-bold text-slate-500">Pacientes activos</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Simba (Golden) • Milo (Europeo)</p>
+                    </div>
+                    <div
+                        class="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 font-semibold">
+                        <span>Chips vinculados</span>
+                        <span class="text-emerald-600 font-bold">100% OK</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div
+                    class="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">PRÓXIMA CITA</span>
+                        <div
+                            class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center text-sm">
+                            📅</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-xl font-black text-teal-900">Mañana</span>
+                            <span class="text-xs font-bold text-slate-500">10:30 AM</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Dra. Mariana Pariona • Control Post-Op</p>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                        <span class="text-slate-400 font-medium">Sede Central San Borja</span>
+                        <span
+                            class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">Confirmada</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div
+                    class="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">VACUNAS Y
+                            PROTECCIÓN</span>
+                        <div
+                            class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center text-sm">
+                            🧪</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-slate-900">100%</span>
+                            <span class="text-xs font-bold text-slate-500">Protegidos</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Próximo refuerzo en 45 días</p>
+                    </div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-[#005c53] h-full w-full"></div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div
+                    class="bg-white p-5 rounded-3xl border border-slate-200/70 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">HISTORIALES
+                            CLÍNICOS</span>
+                        <div
+                            class="w-8 h-8 rounded-xl bg-teal-50 text-teal-800 flex items-center justify-center text-sm">
+                            📋</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-3xl font-black text-slate-900">8</span>
+                            <span class="text-xs font-bold text-slate-500">Consultas</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Reportes y recetas digitales emitidas</p>
+                    </div>
+                    <a href="#"
+                        class="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-teal-800 font-bold hover:underline">
+                        <span>Descargar historial consolidado</span>
+                        <span>↓</span>
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- 3. Sección "Mis Mascotas" -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900">Mis Mascotas</h2>
+                        <p class="text-xs text-slate-500">Fichas clínicas activas y gestión médica directa</p>
+                    </div>
+                    <span class="px-3 py-1 rounded-full bg-slate-200/70 text-slate-700 text-xs font-bold">
+                        2 Pacientes en seguimiento
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+                    <!-- Mascota 1: Simba -->
+                    <div
+                        class="bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="flex items-start gap-3">
+                            <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=200&auto=format&fit=crop"
+                                alt="Simba" class="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-black text-slate-900 text-base">Simba</h3>
+                                    <span
+                                        class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold text-[9px]">CANINO</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Golden Retriever • 5 años</p>
+                                <div class="flex items-center gap-2 text-[10px] text-slate-400 font-semibold mt-1">
+                                    <span>Macho castrado</span>
+                                    <span>•</span>
+                                    <span>31.5 kg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-2xl space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-500">
+                                <span>Microchip:</span>
+                                <span class="font-bold text-slate-800">#7890-PER-2021</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500">
+                                <span>Cobertura:</span>
+                                <span class="font-bold text-slate-800">Plan Preventivo Senior</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500">
+                                <span>Diagnóstico:</span>
+                                <span class="font-bold text-emerald-600">Salud Óptima</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                                class="py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs transition-colors flex items-center justify-center gap-1">
+                                🧪 Cartilla
+                            </button>
+                            <button
+                                class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1">
+                                📑 Historial
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mascota 2: Milo -->
+                    <div
+                        class="bg-white rounded-3xl border border-slate-200/70 p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                        <div class="flex items-start gap-3">
+                            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=200&auto=format&fit=crop"
+                                alt="Milo" class="w-14 h-14 rounded-2xl object-cover shadow-sm" />
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-black text-slate-900 text-base">Milo</h3>
+                                    <span
+                                        class="px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 font-bold text-[9px]">FELINO</span>
+                                </div>
+                                <p class="text-xs text-slate-500">Gato Europeo Atigrado • 3 años</p>
+                                <div class="flex items-center gap-2 text-[10px] text-slate-400 font-semibold mt-1">
+                                    <span>Macho</span>
+                                    <span>•</span>
+                                    <span>4.8 kg</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-2xl space-y-1.5 text-[11px]">
+                            <div class="flex justify-between text-slate-500">
+                                <span>Microchip:</span>
+                                <span class="font-bold text-slate-800">#4512-PER-2023</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500">
+                                <span>Tratamiento:</span>
+                                <span class="font-bold text-slate-800">Dermatológico al día</span>
+                            </div>
+                            <div class="flex justify-between text-slate-500">
+                                <span>Antipulgas:</span>
+                                <span class="font-bold text-amber-600">15 de Noviembre</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button
+                                class="py-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs transition-colors flex items-center justify-center gap-1">
+                                🧪 Cartilla
+                            </button>
+                            <button
+                                class="py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1">
+                                📑 Historial
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Registrar Nueva Mascota -->
+                    <div
+                        class="bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200 p-6 flex flex-col items-center justify-center text-center space-y-3 hover:border-teal-600 transition-colors cursor-pointer group">
+                        <div
+                            class="w-12 h-12 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-teal-800 group-hover:scale-110 transition-all text-xl">
+                            +
+                        </div>
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-sm">Registrar Nueva Mascota</h3>
+                            <p class="text-xs text-slate-400 mt-1 max-w-xs">Vincula un nuevo canino o felino a tu cuenta
+                                para centralizar historial médico y vacunas.</p>
+                        </div>
+                        <button
+                            class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-bold text-xs shadow-sm group-hover:bg-[#005c53] group-hover:text-white group-hover:border-transparent transition-all">
+                            Comenzar registro
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 4. Fila Inferior: Próxima Cita & Vacunas -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Próxima Cita Programada (7 de 12 cols) -->
+                <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-200/70 p-6 shadow-sm space-y-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-800 flex items-center justify-center text-lg font-bold">
+                                📅
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 text-base leading-none">Próxima Cita Programada
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Turno reservado y verificado</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">
+                            Confirmada • En 24 Horas
+                        </span>
+                    </div>
+
+                    <!-- Card de la cita -->
+                    <div class="bg-teal-50/40 rounded-2xl p-5 border border-teal-100/60 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=150&auto=format&fit=crop"
+                                alt="Dra. Mariana"
+                                class="w-12 h-12 rounded-xl object-cover border border-white shadow-sm" />
+                            <div>
+                                <span
+                                    class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">PACIENTE:
+                                    SIMBA (GOLDEN RETRIEVER)</span>
+                                <h4 class="font-bold text-slate-900 text-sm">Control post-operatorio y chequeo de rutina
+                                </h4>
+                                <p class="text-xs text-slate-500">Dra. Mariana Pariona • Directora Médica & Especialista
+                                    en Cirugía</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                            <div class="bg-white p-3 rounded-xl border border-slate-100">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">FECHA Y HORARIO</span>
+                                <p class="text-xs font-bold text-slate-900 mt-0.5">Mañana, 29 de Octubre</p>
+                                <p class="text-[11px] text-teal-800 font-bold">10:30 AM - 11:15 AM</p>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-slate-100">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase">UBICACIÓN</span>
+                                <p class="text-xs font-bold text-slate-900 mt-0.5">Sede Central San Borja</p>
+                                <p class="text-[11px] text-slate-500">Av. Los Sauces 482, Lima</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-white/80 p-3 rounded-xl text-xs text-slate-600 flex items-start gap-2 border border-slate-100">
+                            <span class="text-teal-800 font-bold text-sm">ⓘ</span>
+                            <p class="text-[11px] leading-relaxed">
+                                <strong>Indicaciones de preparación previa:</strong> Mantener ayuno de sólidos de mínimo
+                                4 horas previas a la consulta para ecografía de control. Traer cartilla física y arnés
+                                seguro.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 text-xs">
+                        <div class="flex gap-2">
+                            <button
+                                class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors">
+                                Modificar fecha u hora
+                            </button>
+                            <button
+                                class="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold transition-colors">
+                                Cancelar cita
+                            </button>
+                        </div>
+                        <a href="#" class="text-teal-800 font-bold hover:underline flex items-center gap-1">
+                            📍 Cómo llegar (Google Maps)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Inmunización & Fármacos (5 de 12 cols) -->
+                <div
+                    class="lg:col-span-5 bg-white rounded-3xl border border-slate-200/70 p-6 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-2">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center text-lg font-bold">
+                                    🛡️
+                                </div>
+                                <div>
+                                    <h3 class="font-extrabold text-slate-900 text-base leading-none">Inmunización &
+                                        Fármacos</h3>
+                                    <p class="text-xs text-slate-400 mt-0.5">Estado preventivo reciente</p>
+                                </div>
+                            </div>
+                            <button class="text-slate-400 hover:text-slate-600 font-bold">•••</button>
+                        </div>
+
+                        <!-- Items de Vacunas -->
+                        <div class="space-y-3 pt-3">
+
+                            <!-- Item 1 -->
+                            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-xs font-bold text-slate-900">Vacuna Séxtuple Canina</h4>
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-200/70 text-slate-700 text-[9px] font-bold">Simba</span>
+                                    </div>
+                                    <span
+                                        class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">✓
+                                        Vigente</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400">Aplicada hace 1 mes • Lote #VX-994</p>
+                                <p class="text-[10px] text-slate-500 font-medium pt-0.5">Refuerzo: Sep 2025</p>
+                            </div>
+
+                            <!-- Item 2 -->
+                            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-xs font-bold text-slate-900">Desparasitación NexGard</h4>
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-200/70 text-slate-700 text-[9px] font-bold">Milo</span>
+                                    </div>
+                                    <span
+                                        class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⏳
+                                        Próximo</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400">Control antiparasitario interno & externo</p>
+                                <p class="text-[10px] text-slate-500 font-medium pt-0.5">15 de Noviembre</p>
+                            </div>
+
+                            <!-- Item 3 -->
+                            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-xs font-bold text-slate-900">Antirrábica Anual</h4>
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-200/70 text-slate-700 text-[9px] font-bold">Simba</span>
+                                    </div>
+                                    <span
+                                        class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">✓
+                                        Al Día</span>
+                                </div>
+                                <p class="text-[10px] text-slate-400">Certificado oficial emitido por MINSA</p>
+                                <p class="text-[10px] text-slate-500 font-medium pt-0.5">Refuerzo: May 2025</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button
+                        class="w-full py-2.5 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs transition-colors mt-4">
+                        Ver calendario completo de vacunación
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- 5. Banner de Emergencia en el pie de página del scroll -->
+
+
+        </div>
+
+    </div>
+</div>
