@@ -181,6 +181,7 @@
                             </div>
                             <input id="login-email" type="email" autocomplete="email"
                                 placeholder="ejemplo@correo.com" [formField]="usuarioFormulario.email"
+                                [class.border-red-300]="usuarioFormulario.email().touched() && usuarioFormulario.email().errors().length > 0"
                                 class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-850 focus:bg-white transition-all" />
                         </div>
                         @if (usuarioFormulario.email().touched() && usuarioFormulario.email().errors().length) {
@@ -203,6 +204,7 @@
                             <input id="login-password" [type]="mostrarPassword() ? 'text' : 'password'"
                                 autocomplete="current-password" placeholder="••••••••••••"
                                 [formField]="usuarioFormulario.password"
+                                [class.border-red-300]="usuarioFormulario.password().touched() && usuarioFormulario.password().errors().length > 0"
                                 class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-850 focus:bg-white transition-all" />
                             <button type="button" (click)="mostrarPassword.set(!mostrarPassword())"
                                 [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"

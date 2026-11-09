@@ -1,0 +1,121 @@
+<div class="space-y-6">
+
+    <!-- Encabezado -->
+    <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Facturación</span>
+            <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Pagos y Comprobantes</h1>
+            <p class="mt-1 text-xs text-slate-500">Consulta tus pagos, saldos pendientes y descarga comprobantes.</p>
+        </div>
+        <span class="rounded-full bg-slate-200/70 px-3 py-1 text-xs font-bold text-slate-700">{{ cantidad() }}
+            comprobante(s)</span>
+    </header>
+
+    <!-- Resumen -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total pagado</span>
+                <span class="text-lg">✅</span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-emerald-600">{{ formatearMoneda(totalPagado()) }}</p>
+            <p class="text-[11px] text-slate-400">Pagos confirmados</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Saldo pendiente</span>
+                <span class="text-lg">⏳</span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-amber-600">{{ formatearMoneda(totalPendiente()) }}</p>
+            <p class="text-[11px] text-slate-400">Pagos por regularizar</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Comprobantes</span>
+                <span class="text-lg">🧾</span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-slate-900">{{ cantidad() }}</p>
+            <p class="text-[11px] text-slate-400">Documentos emitidos</p>
+        </article>
+    </section>
+
+    <!-- Filtro -->
+    <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <label class="flex items-center gap-2 text-xs font-bold text-slate-600">
+            Estado del pago:
+            <select (change)="cambiarFiltro($event)"
+                class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal outline-none focus:border-teal-600 focus:bg-white">
+                <option value="Todos">Todos</option>
+                <option value="Pagado">Pagado</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Vencido">Vencido</option>
+            </select>
+        </label>
+        <p class="text-xs font-semibold text-slate-500">{{ pagos().length }} resultado(s)</p>
+    </div>
+
+    <!-- Tabla -->
+    <section class="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[720px] text-left text-xs">
+                <thead class="border-b border-slate-100 bg-slate-50/70 text-[10px] uppercase tracking-wider text-slate-400">
+                    <tr>
+                        <th class="px-5 py-3 font-bold">Comprobante</th>
+                        <th class="px-5 py-3 font-bold">Concepto</th>
+                        <th class="px-5 py-3 font-bold">Fecha</th>
+                        <th class="px-5 py-3 font-bold">Método</th>
+                        <th class="px-5 py-3 font-bold">Monto</th>
+                        <th class="px-5 py-3 font-bold">Estado</th>
+                        <th class="px-5 py-3 text-right font-bold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    @for (pago of pagos(); track pago.id) {
+                    <tr class="transition-colors hover:bg-slate-50/70">
+                        <td class="px-5 py-4 font-bold text-slate-900">{{ pago.codigo }}</td>
+                        <td class="px-5 py-4">
+                            <p class="font-semibold text-slate-800">{{ pago.concepto }}</p>
+                            @if (pago.mascotaNombre) {
+                            <p class="text-[10px] text-slate-400">{{ pago.mascotaNombre }}</p>
+                            }
+                        </td>
+                        <td class="px-5 py-4 text-slate-500">{{ formatearFecha(pago.fecha) }}</td>
+                        <td class="px-5 py-4 text-slate-500">{{ pago.metodo }}</td>
+                        <td class="px-5 py-4 font-bold text-slate-900">{{ formatearMoneda(pago.monto) }}</td>
+                        <td class="px-5 py-4">
+                            <span class="rounded-full px-2.5 py-1 text-[10px] font-bold"
+                                [class]="claseEstado(pago.estado)">{{ pago.estado }}</span>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                @if (pago.estado !== 'Pagado') {
+                                <button (click)="marcarPagado(pago)"
+                                    class="rounded-lg bg-emerald-50 px-2.5 py-1.5 text-[10px] font-bold text-emerald-700 hover:bg-emerald-100">
+                                    Marcar pagado
+                                </button>
+                                }
+                                <button (click)="verComprobante(pago)"
+                                    class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-[10px] font-bold text-slate-700 hover:bg-slate-200">
+                                    Ver
+                                </button>
+                                <button (click)="descargar(pago)"
+                                    class="rounded-lg bg-teal-50 px-2.5 py-1.5 text-[10px] font-bold text-teal-800 hover:bg-teal-100">
+                                    Descargar
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    } @empty {
+                    <tr>
+                        <td colspan="7" class="px-5 py-12 text-center text-slate-400">No hay comprobantes para este
+                            filtro.</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <p class="text-[10px] text-slate-400">Los comprobantes son documentos simulados generados por el portal. Para
+        facturación electrónica oficial, solicítala en recepción.</p>
+</div>

@@ -1,0 +1,259 @@
+<div class="space-y-8">
+
+    <!-- Hero de bienvenida -->
+    <section
+        class=" bg-white relative flex flex-col items-start justify-between gap-6 overflow-hidden rounded-3xl uv run uvicorn backend.main:app p-6 text-white shadow-xl shadow-[#005c53]/15 sm:p-8 md:flex-row md:items-center">
+        <div class="relative z-10 max-w-2xl space-y-3 ng-animate-in" ng-animate-in-class="ng-animate-in-fade-up" ng-animate-in-delay="100">
+            <span
+                class="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-extrabold text-red-500 backdrop-blur-md">
+                <span class="h-1.5 w-1.5 rounded-full bg-red-400" text></span>
+                SEDE CENTRAL PARQUE TUPAC  ABIERTO 24/7
+            </span>
+            <h1 class="text-2xl text-black font-extrabold tracking-tight sm:text-3xl">
+                {{ saludo() }}, {{ usuario()?.nombres ?? 'propietario' }} 👋
+            </h1>
+            <p class="text-xs text-gray-600 leading-relaxed sm:text-sm">
+                Aquí tienes el estado de salud, citas y recordatorios preventivos de
+                <strong class="text-black">{{ nombresMascotas() || 'tus mascotas' }}</strong>.
+            </p>
+        </div>
+
+        <a routerLink="/dashboard/citas"
+            class="relative z-10 flex shrink-0 items-center gap-2 rounded-2xl bg-white px-5 py-3 text-xs font-extrabold text-[#005c53] shadow-lg transition-all hover:-translate-y-0.5 hover:bg-slate-50 active:translate-y-0">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Solicitar nueva cita veterinaria
+        </a>
+    </section>
+
+    <!-- Métricas -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mascotas
+                    registradas</span>
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-sm text-teal-800">🐾
+                </div>
+            </div>
+            <div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-900">{{ totalMascotas() }}</span>
+                    <span class="text-xs font-bold text-slate-500">pacientes activos</span>
+                </div>
+                <p class="mt-1 text-[11px] text-slate-400">{{ nombresMascotas() || 'Sin mascotas registradas' }}</p>
+            </div>
+            <a routerLink="/dashboard/mascotas"
+                class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-teal-800 hover:underline">
+                <span>Gestionar mascotas</span><span>→</span>
+            </a>
+        </article>
+
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próxima cita</span>
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-sm text-teal-800">📅
+                </div>
+            </div>
+            <div>
+                @if (proximaCita(); as cita) {
+                <div class="flex items-baseline gap-2">
+                    <span class="text-xl font-black text-teal-900">{{ formatearFecha(cita.fecha) }}</span>
+                </div>
+                <p class="mt-1 text-[11px] text-slate-500">{{ formatearHora(cita.hora) }} • {{ cita.doctor }}</p>
+                } @else {
+                <span class="text-xl font-black text-teal-900">Sin citas</span>
+                <p class="mt-1 text-[11px] text-slate-400">Agenda tu próximo control.</p>
+                }
+            </div>
+            <a routerLink="/dashboard/citas"
+                class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-teal-800 hover:underline">
+                <span>Ver agenda</span><span>→</span>
+            </a>
+        </article>
+
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vacunas y
+                    protección</span>
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-sm text-teal-800">💉
+                </div>
+            </div>
+            <div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-900">{{ porcentajeVacunas() }}%</span>
+                    <span class="text-xs font-bold text-slate-500">al día</span>
+                </div>
+                <p class="mt-1 text-[11px] text-slate-400">{{ vacunasVigentes() }} vigentes • {{ vencidas() }}
+                    vencidas</p>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                <div class="h-full rounded-full bg-[#005c53]" [style.width.%]="porcentajeVacunas()"></div>
+            </div>
+        </article>
+
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Historiales
+                    clínicos</span>
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-50 text-sm text-teal-800">📋
+                </div>
+            </div>
+            <div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-black text-slate-900">{{ totalHistoriales() }}</span>
+                    <span class="text-xs font-bold text-slate-500">consultas</span>
+                </div>
+                <p class="mt-1 text-[11px] text-slate-400">Reportes y recetas digitales emitidas</p>
+            </div>
+            <a routerLink="/dashboard/historial"
+                class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-teal-800 hover:underline">
+                <span>Ver historial completo</span><span>→</span>
+            </a>
+        </article>
+    </section>
+
+    <!-- Próxima cita + recordatorios -->
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <article class="space-y-5 rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm lg:col-span-7">
+            <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-teal-50 text-lg text-teal-800">
+                        📅</div>
+                    <div>
+                        <h2 class="text-base font-extrabold leading-none text-slate-900">Próxima cita programada</h2>
+                        <p class="mt-0.5 text-xs text-slate-400">Turno reservado y verificado</p>
+                    </div>
+                </div>
+                @if (proximaCita(); as cita) {
+                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+                    {{ cita.estado }}
+                </span>
+                }
+            </div>
+
+            @if (proximaCita(); as cita) {
+            <div class="space-y-4 rounded-2xl border border-teal-100/60 bg-teal-50/40 p-5">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-12 w-12 items-center justify-center rounded-xl border border-white bg-white text-xl shadow-sm">
+                        🐶</div>
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">PACIENTE:
+                            {{ cita.mascotaNombre }}</span>
+                        <h3 class="text-sm font-bold text-slate-900">{{ cita.motivo }}</h3>
+                        <p class="text-xs text-slate-500">{{ cita.doctor }} • {{ cita.especialidad }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                    <div class="rounded-xl border border-slate-100 bg-white p-3">
+                        <span class="text-[9px] font-bold uppercase text-slate-400">Fecha y horario</span>
+                        <p class="mt-0.5 text-xs font-bold text-slate-900">{{ formatearFecha(cita.fecha) }}</p>
+                        <p class="text-[11px] font-bold text-teal-800">{{ formatearHora(cita.hora) }}</p>
+                    </div>
+                    <div class="rounded-xl border border-slate-100 bg-white p-3">
+                        <span class="text-[9px] font-bold uppercase text-slate-400">Ubicación</span>
+                        <p class="mt-0.5 text-xs font-bold text-slate-900">{{ cita.sede }}</p>
+                        <p class="text-[11px] text-slate-500">{{ cita.direccion }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-2 rounded-xl border border-slate-100 bg-white/80 p-3 text-xs text-slate-600">
+                    <span class="text-sm font-bold text-teal-800">ⓘ</span>
+                    <p class="text-[11px] leading-relaxed">{{ cita.indicaciones }}</p>
+                </div>
+            </div>
+            } @else {
+            <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-8 text-center">
+                <p class="text-sm font-bold text-slate-700">No tienes citas próximas</p>
+                <p class="mt-1 text-xs text-slate-400">Solicita una nueva cita desde la sección Citas y Consultas.</p>
+                <a routerLink="/dashboard/citas"
+                    class="mt-4 inline-flex rounded-xl bg-[#005c53] px-4 py-2 text-xs font-bold text-white">Agendar
+                    cita</a>
+            </div>
+            }
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs">
+                <a routerLink="/dashboard/citas"
+                    class="rounded-xl bg-slate-100 px-3.5 py-2 font-bold text-slate-700 transition-colors hover:bg-slate-200">
+                    Gestionar mis citas
+                </a>
+                <a routerLink="/dashboard/vacunas" class="flex items-center gap-1 font-bold text-teal-800 hover:underline">
+                    💉 Ver calendario de vacunación
+                </a>
+            </div>
+        </article>
+
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm lg:col-span-5">
+            <div>
+                <div class="flex items-center gap-3 pb-2">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-50 text-lg text-emerald-800">
+                        🛡️</div>
+                    <div>
+                        <h2 class="text-base font-extrabold leading-none text-slate-900">Recordatorios preventivos</h2>
+                        <p class="mt-0.5 text-xs text-slate-400">Vacunas y tratamientos por atender</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-3">
+                    @for (vacuna of recordatorios(); track vacuna.id) {
+                    <div class="space-y-1 rounded-2xl border border-slate-100 bg-slate-50 p-3.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-xs font-bold text-slate-900">{{ vacuna.nombre }}</h3>
+                                <span class="rounded bg-slate-200/70 px-2 py-0.5 text-[9px] font-bold text-slate-700">{{
+                                    vacuna.mascotaNombre }}</span>
+                            </div>
+                            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold" [class]="estadoVacuna(vacuna) === 'Vencido'
+                                    ? 'bg-rose-50 text-rose-600'
+                                    : 'bg-amber-50 text-amber-600'">
+                                {{ estadoVacuna(vacuna) }}
+                            </span>
+                        </div>
+                        <p class="text-[10px] text-slate-400">{{ vacuna.tipo }} • Lote {{ vacuna.lote }}</p>
+                        <p class="pt-0.5 text-[10px] font-medium text-slate-500">Próxima dosis: {{
+                            formatearFecha(vacuna.proximaDosis) }}</p>
+                    </div>
+                    } @empty {
+                    <p class="rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-400">Todo al día. No
+                        hay refuerzos pendientes.</p>
+                    }
+                </div>
+            </div>
+
+            <a routerLink="/dashboard/vacunas"
+                class="mt-4 w-full rounded-xl bg-teal-50 py-2.5 text-center text-xs font-bold text-teal-800 transition-colors hover:bg-teal-100">
+                Ver calendario completo de vacunación
+            </a>
+        </article>
+    </section>
+
+    <!-- Historial reciente -->
+    <section class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-extrabold text-slate-900">Actividad clínica reciente</h2>
+                <p class="text-xs text-slate-500">Últimas atenciones registradas en el portal</p>
+            </div>
+            <a routerLink="/dashboard/historial" class="text-xs font-bold text-teal-800 hover:underline">Ver todo →</a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+            @for (registro of historialReciente(); track registro.id) {
+            <article class="space-y-3 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <span class="rounded-full bg-teal-50 px-2.5 py-1 text-[10px] font-bold text-teal-800">{{
+                        registro.mascotaNombre }}</span>
+                    <span class="text-[10px] font-semibold text-slate-400">{{ formatearFecha(registro.fecha) }}</span>
+                </div>
+                <h3 class="text-sm font-bold text-slate-900">{{ registro.motivo }}</h3>
+                <p class="line-clamp-2 text-[11px] text-slate-500">{{ registro.diagnostico }}</p>
+                <p class="border-t border-slate-100 pt-2 text-[10px] font-semibold text-slate-400">{{ registro.doctor }}
+                </p>
+            </article>
+            }
+        </div>
+    </section>
+</div>

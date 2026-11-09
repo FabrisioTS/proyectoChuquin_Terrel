@@ -1,0 +1,179 @@
+<div class="space-y-6">
+
+    <!-- Encabezado -->
+    <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Portal del propietario</span>
+            <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Mis Mascotas</h1>
+            <p class="mt-1 text-xs text-slate-500">Fichas clínicas activas y gestión médica directa.</p>
+        </div>
+        <button (click)="abrirFormulario()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005c53] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 transition-all hover:-translate-y-0.5 hover:bg-[#004841]">
+            <span class="text-base leading-none">+</span> Registrar mascota
+        </button>
+    </header>
+
+    <!-- Formulario -->
+    @if (mostrarFormulario()) {
+    <section class="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm sm:p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-extrabold text-slate-900">
+                    {{ editandoId() !== null ? 'Editar mascota' : 'Nueva mascota' }}
+                </h2>
+                <p class="text-xs text-slate-500">Completa la ficha para centralizar su historial y vacunas.</p>
+            </div>
+            <button (click)="cerrarFormulario()" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                aria-label="Cerrar formulario">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Nombre *</span>
+                <input formControlName="nombre" type="text" placeholder="Ej. Simba"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Especie *</span>
+                <select formControlName="especie"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white">
+                    <option value="CANINO">Canino</option>
+                    <option value="FELINO">Felino</option>
+                    <option value="OTRO">Otro</option>
+                </select>
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Raza *</span>
+                <input formControlName="raza" type="text" placeholder="Ej. Golden Retriever"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Edad (años) *</span>
+                <input formControlName="edad" type="number" min="0"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Sexo *</span>
+                <input formControlName="sexo" type="text" placeholder="Macho / Hembra"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Peso (kg) *</span>
+                <input formControlName="peso" type="number" min="0" step="0.1"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Microchip</span>
+                <input formControlName="microchip" type="text" placeholder="#0000-PER-2026"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Diagnóstico actual</span>
+                <input formControlName="diagnostico" type="text"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Cobertura</span>
+                <input formControlName="cobertura" type="text"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
+                <button type="submit"
+                    class="rounded-xl bg-[#005c53] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 hover:bg-[#004841]">
+                    {{ editandoId() !== null ? 'Guardar cambios' : 'Registrar mascota' }}
+                </button>
+                <button type="button" (click)="cerrarFormulario()"
+                    class="rounded-xl bg-slate-100 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </section>
+    }
+
+    <!-- Resumen -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-xs font-semibold text-slate-500">{{ mascotas().length }} de {{ total() }} mascota(s) en
+            seguimiento</p>
+        <span class="rounded-full bg-slate-200/70 px-3 py-1 text-xs font-bold text-slate-700">{{ total() }}
+            Pacientes activos</span>
+    </div>
+
+    <!-- Lista -->
+    <section class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        @for (mascota of mascotas(); track mascota.id) {
+        <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-start gap-3">
+                @if (mascota.foto) {
+                <img [src]="mascota.foto" [alt]="mascota.nombre"
+                    class="h-14 w-14 rounded-2xl border border-slate-100 object-cover shadow-sm" />
+                } @else {
+                <div
+                    class="flex h-14 w-14 items-center justify-center rounded-2xl border border-teal-100 bg-teal-50 text-2xl">
+                    🐾</div>
+                }
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h2 class="truncate text-base font-black text-slate-900">{{ mascota.nombre }}</h2>
+                        <span class="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-bold text-teal-800">{{
+                            mascota.especie }}</span>
+                    </div>
+                    <p class="truncate text-xs text-slate-500">{{ mascota.raza }} • {{ mascota.edad }} años</p>
+                    <p class="mt-1 text-[10px] font-semibold text-slate-400">{{ mascota.sexo }} • {{ mascota.peso }}
+                        kg</p>
+                </div>
+            </div>
+
+            <div class="space-y-1.5 rounded-2xl bg-slate-50 p-3 text-[11px]">
+                <div class="flex justify-between gap-2 text-slate-500">
+                    <span>Microchip:</span>
+                    <span class="truncate font-bold text-slate-800">{{ mascota.microchip || 'No registrado' }}</span>
+                </div>
+                <div class="flex justify-between gap-2 text-slate-500">
+                    <span>Cobertura:</span>
+                    <span class="truncate font-bold text-slate-800">{{ mascota.cobertura || 'Sin plan' }}</span>
+                </div>
+                <div class="flex justify-between gap-2 text-slate-500">
+                    <span>Diagnóstico:</span>
+                    <span class="truncate font-bold text-emerald-600">{{ mascota.diagnostico || 'Salud óptima' }}</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <a routerLink="/dashboard/vacunas"
+                    class="flex items-center justify-center gap-1 rounded-xl bg-teal-50 py-2 text-xs font-bold text-teal-800 transition-colors hover:bg-teal-100">🧪
+                    Cartilla</a>
+                <a routerLink="/dashboard/historial"
+                    class="flex items-center justify-center gap-1 rounded-xl bg-slate-100 py-2 text-xs font-bold text-slate-700 transition-colors hover:bg-slate-200">📑
+                    Historial</a>
+            </div>
+
+            <div class="flex items-center justify-between border-t border-slate-100 pt-3">
+                <button (click)="abrirFormulario(mascota)"
+                    class="text-[11px] font-bold text-teal-800 hover:underline">Editar ficha</button>
+                <button (click)="eliminar(mascota)"
+                    class="text-[11px] font-bold text-rose-600 hover:underline">Eliminar</button>
+            </div>
+        </article>
+        } @empty {
+        <div class="col-span-full rounded-3xl border-2 border-dashed border-slate-200 bg-white/60 p-10 text-center">
+            <p class="text-sm font-bold text-slate-700">No tienes mascotas registradas</p>
+            <p class="mt-1 text-xs text-slate-400">Usa el botón "Registrar mascota" para crear la primera ficha.</p>
+        </div>
+        }
+    </section>
+</div>

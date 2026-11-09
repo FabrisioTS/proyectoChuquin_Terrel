@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { email, form, FormField, required } from '@angular/forms/signals';
+import { email, form, FormField, maxLength, required } from '@angular/forms/signals';
 
 import { AutenticacionService } from '../../services/autenticacion-service';
 import { UsuarioLogin } from '../../interfaces/Usuario';
@@ -23,7 +23,9 @@ export class LogIn {
   usuarioFormulario = form(this.usuarioModelo, (esquema) => {
     required(esquema.email, { message: 'El correo electrónico es obligatorio' });
     email(esquema.email, { message: 'Ingresa un correo electrónico válido' });
+    maxLength(esquema.email, 150, { message: 'El correo no debe superar los 150 caracteres' });
     required(esquema.password, { message: 'La contraseña es obligatoria' });
+    maxLength(esquema.password, 72, { message: 'La contraseña no debe superar los 72 caracteres' });
   });
 
   cargando = signal<boolean>(false);
@@ -35,6 +37,7 @@ export class LogIn {
 
     if (this.usuarioFormulario().invalid()) {
       this.usuarioFormulario().markAsTouched();
+      this.mensajeError.set('Revisa los campos marcados antes de continuar.');
       return;
     }
 

@@ -1,0 +1,218 @@
+<div class="space-y-6">
+
+    <!-- Encabezado -->
+    <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Prevención</span>
+            <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Vacunas y Tratamientos</h1>
+            <p class="mt-1 text-xs text-slate-500">Cartilla sanitaria, refuerzos y tratamientos activos.</p>
+        </div>
+        <button (click)="abrirFormulario()"
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005c53] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 transition-all hover:-translate-y-0.5 hover:bg-[#004841]">
+            <span class="text-base leading-none">+</span> Agregar registro
+        </button>
+    </header>
+
+    <!-- Resumen -->
+    <section class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vigentes</span>
+                <span class="text-lg">🛡️</span>
+            </div>
+            <p class="mt-2 text-3xl font-black text-emerald-600">{{ vigentes() }}</p>
+            <p class="text-[11px] text-slate-400">Registros con protección activa</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próximos</span>
+                <span class="text-lg">⏳</span>
+            </div>
+            <p class="mt-2 text-3xl font-black text-amber-600">{{ proximas().length }}</p>
+            <p class="text-[11px] text-slate-400">Refuerzos en los próximos 30 días</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vencidos</span>
+                <span class="text-lg">⚠️</span>
+            </div>
+            <p class="mt-2 text-3xl font-black text-rose-600">{{ vencidas() }}</p>
+            <p class="text-[11px] text-slate-400">Requieren atención inmediata</p>
+        </article>
+    </section>
+
+    <!-- Progreso -->
+    <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-extrabold text-slate-900">Cobertura sanitaria</h2>
+                <p class="text-xs text-slate-500">{{ vigentes() }} de {{ total() }} registros vigentes</p>
+            </div>
+            <span class="text-lg font-black text-teal-800">{{ porcentaje() }}%</span>
+        </div>
+        <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+            <div class="h-full rounded-full bg-[#005c53] transition-all" [style.width.%]="porcentaje()"></div>
+        </div>
+    </section>
+
+    <!-- Formulario -->
+    @if (mostrarFormulario()) {
+    <section class="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm sm:p-6">
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-extrabold text-slate-900">Nuevo registro sanitario</h2>
+                <p class="text-xs text-slate-500">Agrega una vacuna, tratamiento o desparasitación.</p>
+            </div>
+            <button (click)="cerrarFormulario()" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                aria-label="Cerrar formulario">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form [formGroup]="formulario" (ngSubmit)="guardar()" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Mascota *</span>
+                <select formControlName="mascotaId"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white">
+                    @for (mascota of mascotas(); track mascota.id) {
+                    <option [value]="mascota.id">{{ mascota.nombre }}</option>
+                    }
+                </select>
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Tipo *</span>
+                <select formControlName="tipo"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white">
+                    <option value="Vacuna">Vacuna</option>
+                    <option value="Tratamiento">Tratamiento</option>
+                    <option value="Desparasitación">Desparasitación</option>
+                </select>
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Nombre *</span>
+                <input formControlName="nombre" type="text" placeholder="Ej. Séxtuple canina"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Fecha de aplicación *</span>
+                <input formControlName="fechaAplicacion" type="date"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Próxima dosis *</span>
+                <input formControlName="proximaDosis" type="date"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block">
+                <span class="text-[11px] font-bold text-slate-600">Lote</span>
+                <input formControlName="lote" type="text" placeholder="#VX-000"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <label class="block sm:col-span-2 lg:col-span-3">
+                <span class="text-[11px] font-bold text-slate-600">Observaciones</span>
+                <input formControlName="observaciones" type="text" placeholder="Notas de la aplicación"
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+            </label>
+
+            <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
+                <button type="submit"
+                    class="rounded-xl bg-[#005c53] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 hover:bg-[#004841]">
+                    Guardar registro
+                </button>
+                <button type="button" (click)="cerrarFormulario()"
+                    class="rounded-xl bg-slate-100 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </section>
+    }
+
+    <!-- Filtros -->
+    <div class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-wrap items-center gap-3">
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-600">
+                Mascota:
+                <select (change)="cambiarMascota($event)"
+                    class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal outline-none focus:border-teal-600 focus:bg-white">
+                    <option value="0">Todas</option>
+                    @for (mascota of mascotas(); track mascota.id) {
+                    <option [value]="mascota.id">{{ mascota.nombre }}</option>
+                    }
+                </select>
+            </label>
+
+            <label class="flex items-center gap-2 text-xs font-bold text-slate-600">
+                Estado:
+                <select (change)="cambiarEstado($event)"
+                    class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal outline-none focus:border-teal-600 focus:bg-white">
+                    <option value="Todos">Todos</option>
+                    <option value="Vigente">Vigente</option>
+                    <option value="Próximo">Próximo</option>
+                    <option value="Vencido">Vencido</option>
+                </select>
+            </label>
+        </div>
+        <p class="text-xs font-semibold text-slate-500">{{ registros().length }} registro(s)</p>
+    </div>
+
+    <!-- Registros -->
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        @for (vacuna of registros(); track vacuna.id) {
+        <article class="flex flex-col justify-between gap-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+            <div class="space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">{{ vacuna.tipo === 'Vacuna' ? '💉' : vacuna.tipo === 'Tratamiento' ? '💊' : '🧴' }}</span>
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900">{{ vacuna.nombre }}</h2>
+                            <p class="text-[10px] font-semibold text-slate-400">{{ vacuna.tipo }} • {{
+                                vacuna.mascotaNombre }}</p>
+                        </div>
+                    </div>
+                    <span class="rounded-full px-2 py-0.5 text-[10px] font-bold"
+                        [class]="claseEstado(estado(vacuna))">{{ estado(vacuna) }}</span>
+                </div>
+
+                <div class="space-y-1.5 rounded-2xl bg-slate-50 p-3 text-[11px]">
+                    <div class="flex justify-between gap-2 text-slate-500">
+                        <span>Aplicación:</span>
+                        <span class="font-bold text-slate-800">{{ formatearFecha(vacuna.fechaAplicacion) }}</span>
+                    </div>
+                    <div class="flex justify-between gap-2 text-slate-500">
+                        <span>Próxima dosis:</span>
+                        <span class="font-bold text-slate-800">{{ formatearFecha(vacuna.proximaDosis) }}</span>
+                    </div>
+                    <div class="flex justify-between gap-2 text-slate-500">
+                        <span>Lote:</span>
+                        <span class="font-bold text-slate-800">{{ vacuna.lote || 'No registrado' }}</span>
+                    </div>
+                </div>
+
+                @if (vacuna.observaciones) {
+                <p class="text-[10px] leading-relaxed text-slate-500">{{ vacuna.observaciones }}</p>
+                }
+            </div>
+
+            <button (click)="eliminar(vacuna)"
+                class="border-t border-slate-100 pt-3 text-left text-[11px] font-bold text-rose-600 hover:underline">
+                Eliminar registro
+            </button>
+        </article>
+        } @empty {
+        <div class="col-span-full rounded-3xl border-2 border-dashed border-slate-200 bg-white/60 p-10 text-center">
+            <p class="text-sm font-bold text-slate-700">No hay registros con estos filtros</p>
+            <p class="mt-1 text-xs text-slate-400">Cambia los filtros o agrega un nuevo registro sanitario.</p>
+        </div>
+        }
+    </section>
+</div>
