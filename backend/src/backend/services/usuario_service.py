@@ -1,7 +1,12 @@
 import pyodbc
 from fastapi import HTTPException, status
 
-from ..core.segurity import crear_token_acceso, hash_password, verificar_password
+from ..core.segurity import (
+    crear_token_acceso,
+    hash_password,
+    necesita_rehash,
+    verificar_password,
+)
 from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario_esquema import (
@@ -62,6 +67,13 @@ class UsuarioService:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Correo electrónico o contraseña incorrectos",
+            )
+
+        # Migración transparente: los hashes bcrypt antiguos se convierten
+        # a Argon2 la primera vez que el usuario inicia sesión.
+        if necesita_rehash(usuario.password_hash):
+            self.usuario_repositorio.actualizar_password_hash(
+                usuario.id, hash_password(datos_login.password)
             )
 
         token = crear_token_acceso(usuario.id, usuario.email)

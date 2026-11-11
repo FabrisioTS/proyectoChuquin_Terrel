@@ -86,3 +86,17 @@ class UsuarioRepository:
             raise RuntimeError("No se pudo recuperar el usuario recién creado")
 
         return _fila_a_usuario(fila)
+
+    def actualizar_password_hash(
+        self, usuario_id: int, password_hashed: str
+    ) -> None:
+        cursor = self.conexion.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE usuarios SET password_hash = ? WHERE id = ?",
+                password_hashed,
+                usuario_id,
+            )
+        finally:
+            cursor.close()
