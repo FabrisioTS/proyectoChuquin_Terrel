@@ -1,16 +1,22 @@
+import pyodbc
 from fastapi import HTTPException, status
 
 from ..core.segurity import crear_token_acceso, hash_password, verificar_password
-from ..models.usuario_model import UsuarioModel
+from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
-from ..schemas.usuario_esquema import TokenResponse, UsuarioLogin, UsuarioRegistro, UsuarioResponse
+from ..schemas.usuario_esquema import (
+    TokenResponse,
+    UsuarioLogin,
+    UsuarioRegistro,
+    UsuarioResponse,
+)
 
 
 class UsuarioService:
     def __init__(self, usuario_repositorio: UsuarioRepository):
         self.usuario_repositorio = usuario_repositorio
 
-    def registrar_usuario(self, datos_usuario: UsuarioRegistro) -> UsuarioModel:
+    def registrar_usuario(self, datos_usuario: UsuarioRegistro) -> Usuario:
         if self.usuario_repositorio.obtener_usuario_por_email(datos_usuario.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -25,7 +31,17 @@ class UsuarioService:
 
         clave_encriptada = hash_password(datos_usuario.password)
 
-        return self.usuario_repositorio.crear_usuario(datos_usuario, clave_encriptada)
+        try:
+            return self.usuario_repositorio.crear_usuario(
+                datos_usuario, clave_encriptada
+            )
+        except pyodbc.IntegrityError:
+            # Cubre la condición de carrera entre la validación y el INSERT
+            # (índices únicos de email y dni).
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico o el DNI ya están registrados",
+            ) from None
 
     def iniciar_sesion(self, datos_login: UsuarioLogin) -> TokenResponse:
         usuario = self.usuario_repositorio.obtener_usuario_por_email(datos_login.email)
@@ -38,7 +54,9 @@ class UsuarioService:
                 detail="Correo electrónico o contraseña incorrectos",
             )
 
-        es_clave_correcta = verificar_password(datos_login.password, usuario.password_hash)
+        es_clave_correcta = verificar_password(
+            datos_login.password, usuario.password_hash
+        )
 
         if not es_clave_correcta:
             raise HTTPException(
@@ -54,7 +72,7 @@ class UsuarioService:
             usuario=UsuarioResponse.model_validate(usuario),
         )
 
-    def obtener_usuario_actual(self, usuario_id: int) -> UsuarioModel:
+    def obtener_usuario_actual(self, usuario_id: int) -> Usuario:
         usuario = self.usuario_repositorio.obtener_usuario_por_id(usuario_id)
 
         if not usuario:

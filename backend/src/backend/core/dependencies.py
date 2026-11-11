@@ -1,11 +1,11 @@
 import jwt
+import pyodbc
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy.orm import Session
 
 from ..core.segurity import decodificar_token
 from ..database.conection import get_db
-from ..models.usuario_model import UsuarioModel
+from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..services.usuario_service import UsuarioService
 
@@ -23,8 +23,8 @@ def _credenciales_invalidas() -> HTTPException:
 
 def get_current_user(
     credenciales: HTTPAuthorizationCredentials | None = Depends(seguridad_bearer),
-    db: Session = Depends(get_db),
-) -> UsuarioModel:
+    conexion: pyodbc.Connection = Depends(get_db),
+) -> Usuario:
     """Dependencia para proteger rutas: valida el token JWT y devuelve el usuario."""
     if credenciales is None or not credenciales.credentials:
         raise _credenciales_invalidas()
@@ -32,7 +32,7 @@ def get_current_user(
     try:
         payload = decodificar_token(credenciales.credentials)
     except jwt.PyJWTError:
-        raise _credenciales_invalidas()
+        raise _credenciales_invalidas() from None
 
     usuario_id = payload.get("sub")
 
@@ -42,7 +42,7 @@ def get_current_user(
     try:
         usuario_id = int(usuario_id)
     except (TypeError, ValueError):
-        raise _credenciales_invalidas()
+        raise _credenciales_invalidas() from None
 
-    servicio = UsuarioService(UsuarioRepository(db))
+    servicio = UsuarioService(UsuarioRepository(conexion))
     return servicio.obtener_usuario_actual(usuario_id)
