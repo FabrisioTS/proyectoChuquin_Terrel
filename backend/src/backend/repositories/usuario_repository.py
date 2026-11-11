@@ -1,32 +1,102 @@
-from sqlalchemy.orm import Session
+from typing import Any
 
-from ..models.usuario_model import UsuarioModel
+import pyodbc
+
+from ..models.usuario_model import Usuario
 from ..schemas.usuario_esquema import UsuarioRegistro
+
+# Columnas de la tabla usuarios en el mismo orden que la dataclass Usuario.
+COLUMNAS_USUARIO = (
+    "id, nombres, apellidos, email, telefono, dni, password_hash"
+)
+
+
+def _fila_a_usuario(fila: pyodbc.Row) -> Usuario:
+    return Usuario(
+        id=fila.id,
+        nombres=fila.nombres,
+        apellidos=fila.apellidos,
+        email=fila.email,
+        telefono=fila.telefono,
+        dni=fila.dni,
+        password_hash=fila.password_hash,
+    )
 
 
 class UsuarioRepository:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, conexion: pyodbc.Connection):
+        self.conexion = conexion
 
-    def obtener_usuario_por_id(self, usuario_id: int) -> UsuarioModel | None:
-        return self.db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).first()
+    def _buscar_uno(self, consulta: str, valor: Any) -> Usuario | None:
+        cursor = self.conexion.cursor()
 
-    def obtener_usuario_por_email(self, email: str) -> UsuarioModel | None:
-        return self.db.query(UsuarioModel).filter(UsuarioModel.email == email).first()
+        try:
+            # Consulta parametrizada con "?" (evita inyección SQL).
+            cursor.execute(consulta, valor)
+            fila = cursor.fetchone()
+        finally:
+            cursor.close()
 
-    def obtener_usuario_por_dni(self, dni: str) -> UsuarioModel | None:
-        return self.db.query(UsuarioModel).filter(UsuarioModel.dni == dni).first()
+        return _fila_a_usuario(fila) if fila else None
 
-    def crear_usuario(self, usuario_datos: UsuarioRegistro, password_hashed: str) -> UsuarioModel:
-        db_usuario = UsuarioModel(
-            nombres=usuario_datos.nombres,
-            apellidos=usuario_datos.apellidos,
-            email=usuario_datos.email,
-            telefono=usuario_datos.telefono,
-            dni=usuario_datos.dni,
-            password_hash=password_hashed,
+    def obtener_usuario_por_id(self, usuario_id: int) -> Usuario | None:
+        return self._buscar_uno(
+            f"SELECT {COLUMNAS_USUARIO} FROM usuarios WHERE id = ?",
+            usuario_id,
         )
-        self.db.add(db_usuario)
-        self.db.commit()
-        self.db.refresh(db_usuario)
-        return db_usuario
+
+    def obtener_usuario_por_email(self, email: str) -> Usuario | None:
+        return self._buscar_uno(
+            f"SELECT {COLUMNAS_USUARIO} FROM usuarios WHERE email = ?",
+            email,
+        )
+
+    def obtener_usuario_por_dni(self, dni: str) -> Usuario | None:
+        return self._buscar_uno(
+            f"SELECT {COLUMNAS_USUARIO} FROM usuarios WHERE dni = ?",
+            dni,
+        )
+
+    def crear_usuario(
+        self, usuario_datos: UsuarioRegistro, password_hashed: str
+    ) -> Usuario:
+        consulta = f"""
+            INSERT INTO usuarios (nombres, apellidos, email, telefono, dni, password_hash)
+            OUTPUT INSERTED.{COLUMNAS_USUARIO.replace(", ", ", INSERTED.")}
+            VALUES (?, ?, ?, ?, ?, ?)
+        """
+
+        cursor = self.conexion.cursor()
+
+        try:
+            cursor.execute(
+                consulta,
+                usuario_datos.nombres,
+                usuario_datos.apellidos,
+                usuario_datos.email,
+                usuario_datos.telefono,
+                usuario_datos.dni,
+                password_hashed,
+            )
+            fila = cursor.fetchone()
+        finally:
+            cursor.close()
+
+        if fila is None:
+            raise RuntimeError("No se pudo recuperar el usuario recién creado")
+
+        return _fila_a_usuario(fila)
+
+    def actualizar_password_hash(
+        self, usuario_id: int, password_hashed: str
+    ) -> None:
+        cursor = self.conexion.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE usuarios SET password_hash = ? WHERE id = ?",
+                password_hashed,
+                usuario_id,
+            )
+        finally:
+            cursor.close()
