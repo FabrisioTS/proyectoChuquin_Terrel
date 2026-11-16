@@ -163,7 +163,7 @@ export class DashboardLayout {
                 showCancelButton: true,
                 confirmButtonText: 'Sí, cerrar sesión',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
 
             if (!resultado.isConfirmed) {

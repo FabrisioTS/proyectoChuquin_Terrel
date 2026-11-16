@@ -25,7 +25,9 @@ En el primer arranque el backend:
 
 1. Crea `backend/.env` con una `SECRET_KEY` aleatoria si no existe.
 2. Crea `veterinaria_db` si no existe.
-3. Crea `dbo.usuarios` y sus índices si no existen.
+3. Crea las tablas del esquema y sus índices si no existen
+   (`usuarios`, `productos`, `mascotas`, `citas`, `vacunas`,
+   `historial` y `pagos`).
 4. Inserta los usuarios de prueba si no existen.
 
 Todo es **idempotente**: puedes reiniciar el backend las veces que quieras
@@ -72,9 +74,12 @@ El arranque ya la crea, pero también puedes ejecutarlo a mano:
 uv run python -m backend.database.scripts.crear_base_datos
 ```
 
-El script es idempotente y crea la base, la tabla `dbo.usuarios` (`id`,
-`nombres`, `apellidos`, `email`, `telefono`, `dni`, `password_hash`) con
-índices únicos en `email` y `dni`.
+El script es idempotente y crea la base con las tablas `usuarios`,
+`productos`, `mascotas`, `citas`, `vacunas`, `historial` y `pagos`, junto con
+sus índices. La tabla `usuarios` guarda `id`, `nombres`, `apellidos`, `email`,
+`telefono`, `dni` y `password_hash`, con índices únicos en `email` y `dni`.
+Las demás tablas dejan preparada la base para cuando el frontend deje de usar
+`localStorage` y consuma la API.
 
 También puedes abrir
 `src/backend/database/scripts/crear_base_datos.sql` en SQL Server Management

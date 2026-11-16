@@ -55,7 +55,7 @@ export class LogIn {
             title: `Bienvenido, ${respuesta.usuario.nombres}`,
             text: 'Has iniciado sesión correctamente.',
             confirmButtonText: 'Ir al dashboard',
-            confirmButtonColor: '#005c53',
+            confirmButtonColor: '#c2410c',
           });
         } catch {
           // Si el modal falla, no se bloquea el acceso al dashboard.
