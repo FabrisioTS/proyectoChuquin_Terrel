@@ -119,7 +119,7 @@ export class Mascotas {
                 icon: 'success',
                 title: id !== null ? 'Mascota actualizada' : 'Mascota registrada',
                 text: 'La información se guardó correctamente.',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // Sin modal, el cambio ya quedó guardado.
@@ -136,7 +136,7 @@ export class Mascotas {
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#e11d48',
+                confirmButtonColor: '#E31E24',
             });
 
             if (!resultado.isConfirmed) {
@@ -147,7 +147,7 @@ export class Mascotas {
             await Swal.fire({
                 icon: 'success',
                 title: 'Mascota eliminada',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             this.mascotasService.eliminar(mascota.id);

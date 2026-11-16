@@ -3,12 +3,12 @@
     <!-- Encabezado -->
     <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Agenda médica</span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-accent-800">Agenda médica</span>
             <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Citas y Consultas</h1>
             <p class="mt-1 text-xs text-slate-500">Solicita, reprograma y revisa tus turnos veterinarios.</p>
         </div>
         <button (click)="abrirFormulario()"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#005c53] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 transition-all hover:-translate-y-0.5 hover:bg-[#004841]">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#c2410c] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 transition-all hover:-translate-y-0.5 hover:bg-[#9a3412]">
             <span class="text-base leading-none">+</span> Solicitar cita
         </button>
     </header>
@@ -19,7 +19,7 @@
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próxima cita</span>
             @if (proxima(); as cita) {
             <p class="mt-2 text-sm font-black text-slate-900">{{ formatearFecha(cita.fecha) }}</p>
-            <p class="text-[11px] font-bold text-teal-800">{{ formatearHora(cita.hora) }} • {{ cita.mascotaNombre
+            <p class="text-[11px] font-bold text-accent-800">{{ formatearHora(cita.hora) }} • {{ cita.mascotaNombre
                 }}</p>
             } @else {
             <p class="mt-2 text-sm font-black text-slate-900">Sin citas próximas</p>
@@ -40,7 +40,7 @@
 
     <!-- Formulario -->
     @if (mostrarFormulario()) {
-    <section class="rounded-3xl border border-teal-100 bg-white p-5 shadow-sm sm:p-6">
+    <section class="rounded-3xl border border-accent-100 bg-white p-5 shadow-sm sm:p-6">
         <div class="mb-4 flex items-center justify-between">
             <div>
                 <h2 class="text-base font-extrabold text-slate-900">
@@ -61,7 +61,7 @@
             <label class="block">
                 <span class="text-[11px] font-bold text-slate-600">Mascota *</span>
                 <select formControlName="mascotaId"
-                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white">
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white">
                     @for (mascota of mascotas(); track mascota.id) {
                     <option [value]="mascota.id">{{ mascota.nombre }} ({{ mascota.raza }})</option>
                     }
@@ -71,7 +71,7 @@
             <label class="block">
                 <span class="text-[11px] font-bold text-slate-600">Doctor *</span>
                 <select formControlName="doctor"
-                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white">
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white">
                     <option value="Dra. Mariana Pariona">Dra. Mariana Pariona - Cirugía</option>
                     <option value="Dr. Alonso Requena">Dr. Alonso Requena - Dermatología</option>
                     <option value="Dra. Lucía Mendoza">Dra. Lucía Mendoza - Medicina general</option>
@@ -81,24 +81,24 @@
             <label class="block sm:col-span-2">
                 <span class="text-[11px] font-bold text-slate-600">Motivo de la consulta *</span>
                 <input formControlName="motivo" type="text" placeholder="Ej. Control anual y vacunación"
-                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white" />
             </label>
 
             <label class="block">
                 <span class="text-[11px] font-bold text-slate-600">Fecha *</span>
                 <input formControlName="fecha" type="date" [min]="hoy"
-                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white" />
             </label>
 
             <label class="block">
                 <span class="text-[11px] font-bold text-slate-600">Hora *</span>
                 <input formControlName="hora" type="time"
-                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-teal-600 focus:bg-white" />
+                    class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white" />
             </label>
 
             <div class="flex items-end gap-2 sm:col-span-2">
                 <button type="submit"
-                    class="rounded-xl bg-[#005c53] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#005c53]/20 hover:bg-[#004841]">
+                    class="rounded-xl bg-[#c2410c] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 hover:bg-[#9a3412]">
                     {{ editandoId() !== null ? 'Guardar nueva fecha' : 'Solicitar cita' }}
                 </button>
                 <button type="button" (click)="cerrarFormulario()"
@@ -114,17 +114,17 @@
     <div class="flex flex-wrap items-center gap-2">
         <button (click)="cambiarFiltro('proximas')"
             class="rounded-full px-4 py-2 text-xs font-bold transition-colors"
-            [class]="filtro() === 'proximas' ? 'bg-[#005c53] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
+            [class]="filtro() === 'proximas' ? 'bg-[#c2410c] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
             Próximas
         </button>
         <button (click)="cambiarFiltro('pasadas')"
             class="rounded-full px-4 py-2 text-xs font-bold transition-colors"
-            [class]="filtro() === 'pasadas' ? 'bg-[#005c53] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
+            [class]="filtro() === 'pasadas' ? 'bg-[#c2410c] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
             Historial de citas
         </button>
         <button (click)="cambiarFiltro('todas')"
             class="rounded-full px-4 py-2 text-xs font-bold transition-colors"
-            [class]="filtro() === 'todas' ? 'bg-[#005c53] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
+            [class]="filtro() === 'todas' ? 'bg-[#c2410c] text-white' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'">
             Todas
         </button>
     </div>
@@ -136,7 +136,7 @@
             <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div class="flex gap-3">
                     <div
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-lg text-teal-800">
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-50 text-lg text-accent-800">
                         📅</div>
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
@@ -151,7 +151,7 @@
 
                 <div class="shrink-0 rounded-2xl bg-slate-50 px-4 py-2 text-left sm:text-right">
                     <p class="text-xs font-bold text-slate-900">{{ formatearFecha(cita.fecha) }}</p>
-                    <p class="text-[11px] font-bold text-teal-800">{{ formatearHora(cita.hora) }}</p>
+                    <p class="text-[11px] font-bold text-accent-800">{{ formatearHora(cita.hora) }}</p>
                 </div>
             </div>
 

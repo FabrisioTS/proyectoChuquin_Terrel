@@ -206,7 +206,7 @@ export class Principal {
         title: titulo,
         text: texto,
         confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#059669',
+        confirmButtonColor: '#c2410c',
       });
     } catch {
       // Si el modal no está disponible, la página sigue funcionando.

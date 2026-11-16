@@ -2,7 +2,7 @@
 -- Esquema de la base de datos veterinaria_db
 -- SQL Server (autenticación de Windows)
 --
--- Este script crea la tabla e índices en la base que esté
+-- Este script crea las tablas e índices en la base que esté
 -- seleccionada (por ejemplo, veterinaria_db en SSMS).
 -- La creación de la base la hace el backend al arrancar.
 --
@@ -12,10 +12,18 @@
 -- Los usuarios de prueba se insertan desde Python (con Argon2),
 -- en backend/database/inicializacion.py.
 --
+-- El frontend guarda su información en localStorage. Estas
+-- tablas dejan preparada la base para cuando se conecte la API:
+-- productos, mascotas, citas, vacunas, historial y pagos.
+--
 -- Ejecutar desde el proyecto:
 --   uv run python -m backend.database.scripts.crear_base_datos
 -- O abrirlo en SQL Server Management Studio 22 con la base
 -- veterinaria_db seleccionada.
+-- ==========================================================
+
+-- ==========================================================
+-- 1. USUARIOS
 -- ==========================================================
 
 IF OBJECT_ID(N'dbo.usuarios', N'U') IS NULL
@@ -50,5 +58,284 @@ IF NOT EXISTS (
 )
 BEGIN
     CREATE UNIQUE INDEX UX_usuarios_dni ON dbo.usuarios(dni);
+END
+GO
+
+-- ==========================================================
+-- 2. PRODUCTOS (catálogo de la tienda)
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.productos', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.productos (
+        id          INT IDENTITY(1,1) NOT NULL,
+        nombre      NVARCHAR(150)     NOT NULL,
+        categoria   NVARCHAR(40)      NOT NULL,
+        precio      DECIMAL(10,2)     NOT NULL,
+        stock       INT               NOT NULL CONSTRAINT DF_productos_stock DEFAULT (0),
+        descripcion NVARCHAR(600)     NULL,
+        emoji       NVARCHAR(20)      NULL,
+        imagen      NVARCHAR(300)     NULL,
+        activo      BIT               NOT NULL CONSTRAINT DF_productos_activo DEFAULT (1),
+        creado_en   DATETIME2(0)      NOT NULL CONSTRAINT DF_productos_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_productos PRIMARY KEY (id),
+        CONSTRAINT CK_productos_precio CHECK (precio >= 0),
+        CONSTRAINT CK_productos_stock CHECK (stock >= 0),
+        CONSTRAINT CK_productos_categoria CHECK (
+            categoria IN ('Alimentos', 'Juguetes', 'Higiene', 'Salud', 'Accesorios')
+        )
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_productos_categoria'
+      AND object_id = OBJECT_ID(N'dbo.productos')
+)
+BEGIN
+    CREATE INDEX IX_productos_categoria ON dbo.productos(categoria);
+END
+GO
+
+-- ==========================================================
+-- 3. MASCOTAS
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.mascotas', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.mascotas (
+        id           INT IDENTITY(1,1) NOT NULL,
+        usuario_id   INT               NULL,
+        nombre       NVARCHAR(100)     NOT NULL,
+        especie      NVARCHAR(20)      NOT NULL,
+        raza         NVARCHAR(80)      NULL,
+        edad         INT               NULL,
+        sexo         NVARCHAR(20)      NULL,
+        peso         DECIMAL(6,2)      NULL,
+        microchip    NVARCHAR(50)      NULL,
+        diagnostico  NVARCHAR(300)     NULL,
+        cobertura    NVARCHAR(100)     NULL,
+        foto         NVARCHAR(300)     NULL,
+        creado_en    DATETIME2(0)      NOT NULL CONSTRAINT DF_mascotas_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_mascotas PRIMARY KEY (id),
+        CONSTRAINT FK_mascotas_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE SET NULL,
+        CONSTRAINT CK_mascotas_especie CHECK (especie IN ('CANINO', 'FELINO', 'OTRO')),
+        CONSTRAINT CK_mascotas_edad CHECK (edad IS NULL OR edad >= 0),
+        CONSTRAINT CK_mascotas_peso CHECK (peso IS NULL OR peso >= 0)
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_mascotas_usuario'
+      AND object_id = OBJECT_ID(N'dbo.mascotas')
+)
+BEGIN
+    CREATE INDEX IX_mascotas_usuario ON dbo.mascotas(usuario_id);
+END
+GO
+
+-- ==========================================================
+-- 4. CITAS
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.citas', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.citas (
+        id             INT IDENTITY(1,1) NOT NULL,
+        usuario_id     INT               NULL,
+        mascota_id     INT               NOT NULL,
+        mascota_nombre NVARCHAR(100)     NOT NULL,
+        motivo         NVARCHAR(200)     NOT NULL,
+        doctor         NVARCHAR(100)     NULL,
+        especialidad   NVARCHAR(100)     NULL,
+        fecha          DATE              NOT NULL,
+        hora           TIME(0)           NOT NULL,
+        sede           NVARCHAR(100)     NULL,
+        direccion      NVARCHAR(200)     NULL,
+        estado         NVARCHAR(20)      NOT NULL CONSTRAINT DF_citas_estado DEFAULT ('Pendiente'),
+        indicaciones   NVARCHAR(500)     NULL,
+        creado_en      DATETIME2(0)      NOT NULL CONSTRAINT DF_citas_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_citas PRIMARY KEY (id),
+        CONSTRAINT FK_citas_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE SET NULL,
+        CONSTRAINT CK_citas_estado CHECK (
+            estado IN ('Confirmada', 'Pendiente', 'Cancelada', 'Atendida')
+        )
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_citas_usuario'
+      AND object_id = OBJECT_ID(N'dbo.citas')
+)
+BEGIN
+    CREATE INDEX IX_citas_usuario ON dbo.citas(usuario_id);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_citas_fecha'
+      AND object_id = OBJECT_ID(N'dbo.citas')
+)
+BEGIN
+    CREATE INDEX IX_citas_fecha ON dbo.citas(fecha, hora);
+END
+GO
+
+-- ==========================================================
+-- 5. VACUNAS Y TRATAMIENTOS
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.vacunas', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.vacunas (
+        id              INT IDENTITY(1,1) NOT NULL,
+        usuario_id      INT               NULL,
+        mascota_id      INT               NOT NULL,
+        mascota_nombre  NVARCHAR(100)     NOT NULL,
+        nombre          NVARCHAR(150)     NOT NULL,
+        tipo            NVARCHAR(30)      NOT NULL,
+        fecha_aplicacion DATE             NOT NULL,
+        proxima_dosis   DATE              NULL,
+        lote            NVARCHAR(50)      NULL,
+        observaciones   NVARCHAR(500)     NULL,
+        creado_en       DATETIME2(0)      NOT NULL CONSTRAINT DF_vacunas_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_vacunas PRIMARY KEY (id),
+        CONSTRAINT FK_vacunas_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE SET NULL,
+        CONSTRAINT CK_vacunas_tipo CHECK (
+            tipo IN ('Vacuna', 'Tratamiento', 'Desparasitación')
+        )
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_vacunas_mascota'
+      AND object_id = OBJECT_ID(N'dbo.vacunas')
+)
+BEGIN
+    CREATE INDEX IX_vacunas_mascota ON dbo.vacunas(mascota_id);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_vacunas_proxima_dosis'
+      AND object_id = OBJECT_ID(N'dbo.vacunas')
+)
+BEGIN
+    CREATE INDEX IX_vacunas_proxima_dosis ON dbo.vacunas(proxima_dosis);
+END
+GO
+
+-- ==========================================================
+-- 6. HISTORIAL CLÍNICO
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.historial', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.historial (
+        id             INT IDENTITY(1,1) NOT NULL,
+        usuario_id     INT               NULL,
+        mascota_id     INT               NOT NULL,
+        mascota_nombre NVARCHAR(100)     NOT NULL,
+        fecha          DATE              NOT NULL,
+        doctor         NVARCHAR(100)     NULL,
+        motivo         NVARCHAR(200)     NULL,
+        diagnostico    NVARCHAR(500)     NULL,
+        tratamiento    NVARCHAR(500)     NULL,
+        receta         NVARCHAR(1000)    NULL,
+        creado_en      DATETIME2(0)      NOT NULL CONSTRAINT DF_historial_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_historial PRIMARY KEY (id),
+        CONSTRAINT FK_historial_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE SET NULL
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_historial_mascota'
+      AND object_id = OBJECT_ID(N'dbo.historial')
+)
+BEGIN
+    CREATE INDEX IX_historial_mascota ON dbo.historial(mascota_id);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_historial_fecha'
+      AND object_id = OBJECT_ID(N'dbo.historial')
+)
+BEGIN
+    CREATE INDEX IX_historial_fecha ON dbo.historial(fecha);
+END
+GO
+
+-- ==========================================================
+-- 7. PAGOS
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.pagos', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.pagos (
+        id             INT IDENTITY(1,1) NOT NULL,
+        usuario_id     INT               NULL,
+        codigo         NVARCHAR(30)      NOT NULL,
+        concepto       NVARCHAR(200)     NOT NULL,
+        fecha          DATE              NOT NULL,
+        monto          DECIMAL(10,2)     NOT NULL,
+        metodo         NVARCHAR(50)      NULL,
+        estado         NVARCHAR(20)      NOT NULL CONSTRAINT DF_pagos_estado DEFAULT ('Pendiente'),
+        mascota_nombre NVARCHAR(100)     NULL,
+        creado_en      DATETIME2(0)      NOT NULL CONSTRAINT DF_pagos_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_pagos PRIMARY KEY (id),
+        CONSTRAINT FK_pagos_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE SET NULL,
+        CONSTRAINT CK_pagos_monto CHECK (monto >= 0),
+        CONSTRAINT CK_pagos_estado CHECK (
+            estado IN ('Pagado', 'Pendiente', 'Vencido')
+        )
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'UX_pagos_codigo'
+      AND object_id = OBJECT_ID(N'dbo.pagos')
+)
+BEGIN
+    CREATE UNIQUE INDEX UX_pagos_codigo ON dbo.pagos(codigo);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_pagos_usuario'
+      AND object_id = OBJECT_ID(N'dbo.pagos')
+)
+BEGIN
+    CREATE INDEX IX_pagos_usuario ON dbo.pagos(usuario_id);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_pagos_estado'
+      AND object_id = OBJECT_ID(N'dbo.pagos')
+)
+BEGIN
+    CREATE INDEX IX_pagos_estado ON dbo.pagos(estado);
 END
 GO

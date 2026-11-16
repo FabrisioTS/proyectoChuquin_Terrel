@@ -3,12 +3,12 @@
     <!-- Encabezado -->
     <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Tienda veterinaria</span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-accent-800">Tienda veterinaria</span>
             <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Productos</h1>
             <p class="mt-1 text-xs text-slate-500">Alimentos, higiene y cuidado recomendados por la clínica.</p>
         </div>
         <span
-            class="inline-flex items-center justify-center gap-2 rounded-full bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-800">
+            class="inline-flex items-center justify-center gap-2 rounded-full bg-accent-50 px-3 py-1.5 text-xs font-bold text-accent-800">
             🛒 {{ cantidadTotal() }} artículo(s) en el carrito
         </span>
     </header>
@@ -19,13 +19,13 @@
         <section class="space-y-4 lg:col-span-8">
             <div class="flex flex-wrap gap-2">
                 <button (click)="cambiarCategoria('Todas')" class="rounded-full px-3.5 py-2 text-[11px] font-bold transition-colors"
-                    [class]="categoria() === 'Todas' ? 'bg-[#005c53] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'">
+                    [class]="categoria() === 'Todas' ? 'bg-[#c2410c] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'">
                     Todas
                 </button>
                 @for (item of categorias; track item) {
                 <button (click)="cambiarCategoria(item)"
                     class="rounded-full px-3.5 py-2 text-[11px] font-bold transition-colors"
-                    [class]="categoria() === item ? 'bg-[#005c53] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'">
+                    [class]="categoria() === item ? 'bg-[#c2410c] text-white' : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50'">
                     {{ item }}
                 </button>
                 }
@@ -74,7 +74,7 @@
                         </div>
                         } @else {
                         <button (click)="agregar(producto)" [disabled]="producto.stock === 0"
-                            class="w-full rounded-xl bg-[#005c53] py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#004841] disabled:cursor-not-allowed disabled:bg-slate-300">
+                            class="w-full rounded-xl bg-[#c2410c] py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9a3412] disabled:cursor-not-allowed disabled:bg-slate-300">
                             Agregar al carrito
                         </button>
                         }
@@ -94,7 +94,7 @@
             <div class="sticky top-24 space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <h2 class="text-sm font-extrabold text-slate-900">Tu carrito</h2>
-                    <span class="rounded-full bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-800">{{
+                    <span class="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-bold text-accent-800">{{
                         cantidadTotal() }}</span>
                 </div>
 
@@ -140,7 +140,7 @@
                         <span class="text-xl font-black text-slate-900">{{ formatearMoneda(total()) }}</span>
                     </div>
                     <button (click)="finalizarCompra()" [disabled]="itemsCarrito().length === 0"
-                        class="w-full rounded-xl bg-[#005c53] py-3 text-xs font-extrabold text-white shadow-md shadow-[#005c53]/20 transition-colors hover:bg-[#004841] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
+                        class="w-full rounded-xl bg-[#c2410c] py-3 text-xs font-extrabold text-white shadow-md shadow-[#c2410c]/20 transition-colors hover:bg-[#9a3412] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
                         Finalizar compra
                     </button>
                     <p class="text-center text-[10px] text-slate-400">El comprobante se generará automáticamente en

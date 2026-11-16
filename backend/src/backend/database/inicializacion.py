@@ -1,7 +1,8 @@
 """Inicialización automática de la base de datos.
 
-Crea (si faltan) la base veterinaria_db, la tabla dbo.usuarios, sus índices
-y los usuarios de prueba. Es idempotente: se puede ejecutar en cada arranque
+Crea (si faltan) la base veterinaria_db, las tablas e índices del esquema
+(usuarios, productos, mascotas, citas, vacunas, historial y pagos) y los
+usuarios de prueba. Es idempotente: se puede ejecutar en cada arranque
 sin duplicar datos ni sobrescribir contraseñas existentes.
 """
 

@@ -3,7 +3,7 @@
     <!-- Encabezado -->
     <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-800">Facturación</span>
+            <span class="text-[10px] font-extrabold uppercase tracking-wider text-accent-800">Facturación</span>
             <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Pagos y Comprobantes</h1>
             <p class="mt-1 text-xs text-slate-500">Consulta tus pagos, saldos pendientes y descarga comprobantes.</p>
         </div>
@@ -44,7 +44,7 @@
         <label class="flex items-center gap-2 text-xs font-bold text-slate-600">
             Estado del pago:
             <select (change)="cambiarFiltro($event)"
-                class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal outline-none focus:border-teal-600 focus:bg-white">
+                class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-normal outline-none focus:border-accent-600 focus:bg-white">
                 <option value="Todos">Todos</option>
                 <option value="Pagado">Pagado</option>
                 <option value="Pendiente">Pendiente</option>
@@ -99,7 +99,7 @@
                                     Ver
                                 </button>
                                 <button (click)="descargar(pago)"
-                                    class="rounded-lg bg-teal-50 px-2.5 py-1.5 text-[10px] font-bold text-teal-800 hover:bg-teal-100">
+                                    class="rounded-lg bg-accent-50 px-2.5 py-1.5 text-[10px] font-bold text-accent-800 hover:bg-accent-100">
                                     Descargar
                                 </button>
                             </div>

@@ -85,7 +85,7 @@ export class Configuracion {
                 icon: 'success',
                 title: 'Configuración guardada',
                 text: 'Tus datos y preferencias se actualizaron correctamente.',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // Los cambios ya quedaron guardados.

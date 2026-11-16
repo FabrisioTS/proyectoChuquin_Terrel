@@ -54,13 +54,13 @@ export class Pagos {
                         <p><strong>Fecha:</strong> ${formatearFecha(pago.fecha)}</p>
                         <p><strong>Método:</strong> ${pago.metodo}</p>
                         <p><strong>Estado:</strong> ${pago.estado}</p>
-                        <p style="font-size:20px;font-weight:800;color:#005c53;margin-top:12px">
+                        <p style="font-size:20px;font-weight:800;color:#c2410c;margin-top:12px">
                             Total: ${formatearMoneda(pago.monto)}
                         </p>
                     </div>
                 `,
                 confirmButtonText: 'Cerrar',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // Sin modal no se muestra el detalle.

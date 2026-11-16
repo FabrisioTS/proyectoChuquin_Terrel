@@ -150,7 +150,7 @@ export class Citas {
                 showCancelButton: true,
                 confirmButtonText: 'Sí, cancelar',
                 cancelButtonText: 'Volver',
-                confirmButtonColor: '#e11d48',
+                confirmButtonColor: '#E31E24',
             });
 
             if (!resultado.isConfirmed) {
@@ -190,7 +190,7 @@ export class Citas {
                 icon: 'success',
                 title: titulo,
                 text: texto,
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // El cambio ya quedó guardado.

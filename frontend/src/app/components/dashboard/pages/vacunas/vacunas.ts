@@ -120,7 +120,7 @@ export class Vacunas {
                 icon: 'success',
                 title: 'Registro sanitario agregado',
                 text: 'La cartilla de vacunación se actualizó.',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // El registro ya quedó guardado.
@@ -137,7 +137,7 @@ export class Vacunas {
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#e11d48',
+                confirmButtonColor: '#E31E24',
             });
 
             if (!resultado.isConfirmed) {
