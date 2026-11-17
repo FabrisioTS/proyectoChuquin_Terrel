@@ -17,9 +17,8 @@ export class Configuracion {
 
     readonly usuario = this.autenticacionService.usuarioActual;
     readonly sedes = [
-        'Sede Central Los Olivos',
-        'Sede Central San Borja',
-        'Sede Surco',
+        'Sede Central - San Carlos',
+,
     ];
 
     readonly formulario = this.fb.group({
@@ -28,7 +27,7 @@ export class Configuracion {
         email: ['', [Validators.required, Validators.email]],
         telefono: [''],
         dni: [''],
-        sede: ['Sede Central Los Olivos', Validators.required],
+        sede: ['Sede Central San Carlos', Validators.required],
         notificacionesCitas: [true],
         notificacionesVacunas: [true],
         notificacionesPagos: [false],
@@ -64,7 +63,7 @@ export class Configuracion {
             email: (valor.email ?? '').trim(),
             telefono: (valor.telefono ?? '').trim(),
             dni: (valor.dni ?? '').trim(),
-            sede: valor.sede ?? 'Sede Central Los Olivos',
+            sede: valor.sede ?? 'Sede Central - San Carlos',
             notificacionesCitas: Boolean(valor.notificacionesCitas),
             notificacionesVacunas: Boolean(valor.notificacionesVacunas),
             notificacionesPagos: Boolean(valor.notificacionesPagos),
