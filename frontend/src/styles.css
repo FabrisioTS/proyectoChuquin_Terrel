@@ -4,23 +4,34 @@
 
 @theme {
     --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-legible: 'Atkinson Hyperlegible', Verdana, Tahoma, sans-serif;
 
-    /* Paleta de marca: el verde principal coincide con el bloque de "Nosotros". */
-    --color-brand-50: #ecfdf5;
-    --color-brand-100: #d1fae5;
-    --color-brand-200: #a7f3d0;
-    --color-brand-300: #6ee7b7;
-    --color-brand-400: #34d399;
-    --color-brand-500: #10b981;
-    --color-brand-600: #059669;
-    --color-brand-700: #047857;
-    --color-brand-800: #065f46;
-    --color-brand-900: #064e3b;
-    --color-brand-950: #022c22;
+    /* Paleta oficial de Clínica Pariona: naranja, rojo y celeste. */
+    --color-brand-50: #fff7ed;
+    --color-brand-100: #ffedd5;
+    --color-brand-200: #fed7aa;
+    --color-brand-300: #fdba74;
+    --color-brand-400: #fb923c;
+    --color-brand-500: #f7941d;
+    --color-brand-600: #c2410c;
+    --color-brand-700: #9a3412;
+    --color-brand-800: #7c2d12;
+    --color-brand-900: #431407;
+    --color-brand-950: #2a0c03;
 
-    /* Tonos usados por el login y el dashboard. */
-    --color-teal-850: #006a60;
-    --color-teal-900: #004d46;
+    /* Celeste del logo, usado en acentos, focos y paneles secundarios. */
+    --color-accent-50: #eff9fe;
+    --color-accent-100: #dcf2fc;
+    --color-accent-200: #b9e6f9;
+    --color-accent-300: #7dd3f4;
+    --color-accent-400: #45c0ec;
+    --color-accent-500: #29abe2;
+    --color-accent-600: #128fc4;
+    --color-accent-700: #0e729e;
+    --color-accent-800: #0f5c7e;
+    --color-accent-850: #0b4a66;
+    --color-accent-900: #0a3a52;
+    --color-accent-950: #062a3c;
 }
 
 html {
@@ -33,4 +44,114 @@ body {
 
 section[id] {
     scroll-margin-top: 6rem;
+}
+
+/* ==========================================================
+   Accesibilidad
+   ========================================================== */
+
+html.a11y-texto-110 {
+    font-size: 110%;
+}
+
+html.a11y-texto-120 {
+    font-size: 120%;
+}
+
+html.a11y-texto-130 {
+    font-size: 130%;
+}
+
+html.a11y-texto-140 {
+    font-size: 140%;
+}
+
+html.a11y-espaciado :where(p, li, h1, h2, h3, h4, h5, h6, label, a, button, span) {
+    line-height: 1.9 !important;
+    letter-spacing: 0.035em !important;
+    word-spacing: 0.12em !important;
+}
+
+html.a11y-fuente-legible body,
+html.a11y-fuente-legible button,
+html.a11y-fuente-legible input,
+html.a11y-fuente-legible textarea,
+html.a11y-fuente-legible select,
+html.a11y-fuente-legible a {
+    font-family: var(--font-legible) !important;
+}
+
+html.a11y-enlaces a {
+    text-decoration: underline !important;
+    text-decoration-thickness: 2px !important;
+    text-underline-offset: 3px !important;
+    outline: 2px solid #f7941d;
+    outline-offset: 2px;
+}
+
+html.a11y-cursor-grande,
+html.a11y-cursor-grande * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 32 32'%3E%3Cpath d='M4 2 L4 26 L11 19 L16 30 L21 27 L16 17 L26 17 Z' fill='%23c2410c' stroke='%23ffffff' stroke-width='2'/%3E%3C/svg%3E") 4 2, auto !important;
+}
+
+html.a11y-reducir-movimiento *,
+html.a11y-reducir-movimiento *::before,
+html.a11y-reducir-movimiento *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+/* Filtros de visión. Se aplican al contenido de la página, no al widget,
+   para que el botón flotante siga fijo y legible. */
+html.a11y-vision-grises app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: grayscale(1);
+}
+
+html.a11y-vision-protanopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: url(#a11y-protanopia);
+}
+
+html.a11y-vision-deuteranopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: url(#a11y-deuteranopia);
+}
+
+html.a11y-vision-tritanopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: url(#a11y-tritanopia);
+}
+
+/* Alto contraste: invierte el contenido y conserva las imágenes originales. */
+html.a11y-alto-contraste body {
+    background: #111 !important;
+}
+
+html.a11y-alto-contraste app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: contrast(1.15) invert(1) hue-rotate(180deg);
+}
+
+html.a11y-alto-contraste app-root > :not(router-outlet):not(app-accesibilidad) :is(img, video, picture, canvas) {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+html.a11y-alto-contraste.a11y-vision-grises app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: contrast(1.15) invert(1) hue-rotate(180deg) grayscale(1);
+}
+
+html.a11y-alto-contraste.a11y-vision-protanopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: contrast(1.15) invert(1) hue-rotate(180deg) url(#a11y-protanopia);
+}
+
+html.a11y-alto-contraste.a11y-vision-deuteranopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: contrast(1.15) invert(1) hue-rotate(180deg) url(#a11y-deuteranopia);
+}
+
+html.a11y-alto-contraste.a11y-vision-tritanopia app-root > :not(router-outlet):not(app-accesibilidad) {
+    filter: contrast(1.15) invert(1) hue-rotate(180deg) url(#a11y-tritanopia);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }

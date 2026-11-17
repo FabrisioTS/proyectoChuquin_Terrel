@@ -1,20 +1,45 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from collections.abc import Iterator
 
-# Configuración con Autenticación de Windows
-# Reemplaza 'NOMBRE_DE_TU_BD' por el nombre real de tu base de datos en SQL Server
-SERVER = "(localdb)\MSSQLLocalDB"  # O el nombre de tu servidor/instancia, ej: "localhost\\SQLEXPRESS"
-DATABASE = "veterinaria_db"
+import pyodbc
+from fastapi import HTTPException, status
 
-DATABASE_URL = f"mssql+pyodbc://{SERVER}/{DATABASE}?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+from ..core.config import DB_DRIVER, DB_NAME, DB_SERVER, DB_TIMEOUT
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Conexión con autenticación de Windows (usuario y contraseña no son necesarios).
+# TrustServerCertificate evita errores de certificado con ODBC Driver 18.
+CADENA_CONEXION = (
+    f"DRIVER={{{DB_DRIVER}}};"
+    f"SERVER={DB_SERVER};"
+    f"DATABASE={DB_NAME};"
+    "Trusted_Connection=yes;"
+    "TrustServerCertificate=yes;"
+)
 
-# Inyección de dependencia para usar la sesión en tus APIs
-def get_db():
-    db = SessionLocal()
+
+def crear_conexion() -> pyodbc.Connection:
+    """Abre una conexión nueva a SQL Server."""
+    return pyodbc.connect(CADENA_CONEXION, autocommit=False, timeout=DB_TIMEOUT)
+
+
+def get_db() -> Iterator[pyodbc.Connection]:
+    """Dependencia de FastAPI: entrega una conexión y gestiona la transacción."""
     try:
-        yield db
+        conexion = crear_conexion()
+    except pyodbc.Error as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=(
+                "No se pudo conectar a SQL Server. Verifica que el servidor "
+                "'{servidor}' esté iniciado, que la base de datos '{base}' exista "
+                "y que el controlador ODBC esté instalado."
+            ).format(servidor=DB_SERVER, base=DB_NAME),
+        ) from error
+
+    try:
+        yield conexion
+        conexion.commit()
+    except Exception:
+        conexion.rollback()
+        raise
     finally:
-        db.close()
+        conexion.close()

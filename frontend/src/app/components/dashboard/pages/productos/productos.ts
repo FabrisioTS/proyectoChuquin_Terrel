@@ -93,14 +93,14 @@ export class Productos {
                         <hr style="margin:12px 0;border-color:#e2e8f0" />
                         <p style="display:flex;justify-content:space-between;font-size:16px;font-weight:800">
                             <span>Total</span>
-                            <span style="color:#005c53">${formatearMoneda(this.total())}</span>
+                            <span style="color:#c2410c">${formatearMoneda(this.total())}</span>
                         </p>
                     </div>
                 `,
                 showCancelButton: true,
                 confirmButtonText: 'Pagar y generar comprobante',
                 cancelButtonText: 'Seguir comprando',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
 
             if (!resultado.isConfirmed) {
@@ -120,7 +120,7 @@ export class Productos {
                 icon: 'success',
                 title: 'Compra registrada',
                 text: 'El comprobante fue generado en la sección Pagos / Comprobantes.',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // Si el modal falla, no se altera el carrito.

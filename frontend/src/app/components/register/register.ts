@@ -177,7 +177,7 @@ export class Register {
             title: 'Usuario registrado exitosamente',
             text: 'Tu cuenta de propietario ha sido creada. Ya puedes iniciar sesión.',
             confirmButtonText: 'Aceptar',
-            confirmButtonColor: '#005c53',
+            confirmButtonColor: '#c2410c',
             allowOutsideClick: false,
             allowEscapeKey: false,
           });

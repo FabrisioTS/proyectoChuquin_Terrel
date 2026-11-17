@@ -103,7 +103,7 @@ export class Historial {
                 icon: 'success',
                 title: 'Consulta registrada',
                 text: 'El historial médico se actualizó correctamente.',
-                confirmButtonColor: '#005c53',
+                confirmButtonColor: '#c2410c',
             });
         } catch {
             // El registro ya quedó guardado.
@@ -120,7 +120,7 @@ export class Historial {
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#e11d48',
+                confirmButtonColor: '#E31E24',
             });
 
             if (!resultado.isConfirmed) {

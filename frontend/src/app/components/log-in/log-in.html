@@ -6,13 +6,19 @@
 
         <!-- LEFT SIDE: Hero Section -->
         <div
-            class="hidden lg:flex lg:col-span-6 relative flex-col justify-between p-10 xl:p-12 text-white bg-teal-850 overflow-hidden">
+            class="hidden lg:flex lg:col-span-6 relative flex-col justify-between p-10 xl:p-12 text-white bg-accent-950 overflow-hidden">
 
             <!-- Background Overlay & Image -->
             <div class="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
                 style="background-image: url('https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?auto=format&fit=crop&q=80');">
             </div>
-            <div class="absolute inset-0 bg-linear-to-b from-teal-850/90 via-teal-850/80 to-teal-900"></div>
+            <div class="absolute inset-0 bg-linear-to-br from-accent-950/95 via-accent-900/85 to-brand-800"></div>
+            <div
+                class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-brand-500/30 blur-3xl">
+            </div>
+            <div
+                class="pointer-events-none absolute -bottom-20 -left-10 h-64 w-64 rounded-full bg-red-600/25 blur-3xl">
+            </div>
 
             <!-- Header Top Bar -->
             <div class="relative z-10 flex items-center justify-between">
@@ -27,7 +33,7 @@
 
                 <span
                     class="inline-flex items-center gap-2 text-xs font-medium px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
                     ATENCIÓN 24/7 HUANCAYO
                 </span>
             </div>
@@ -35,7 +41,7 @@
             <!-- Main Content Middle -->
             <div class="relative z-10 my-auto py-12">
                 <div
-                    class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-white/15 text-emerald-100 backdrop-blur-md mb-6 border border-white/10">
+                    class="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-white/15 text-accent-100 backdrop-blur-md mb-6 border border-white/10">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -47,7 +53,7 @@
                     Su bienestar,<br />nuestra prioridad.
                 </h1>
 
-                <p class="text-emerald-100/90 text-sm xl:text-base max-w-md leading-relaxed">
+                <p class="text-accent-100/90 text-sm xl:text-base max-w-md leading-relaxed">
                     Cuidamos cada latido con ciencia de vanguardia, precisión médica y el afecto que tu compañero
                     merece.
                 </p>
@@ -65,7 +71,7 @@
                     </div>
                     <div>
                         <h4 class="text-xs font-bold text-white">Acceso Seguro al Expediente</h4>
-                        <p class="text-[11px] text-emerald-100/80">Historial médico, recetas e inmunizaciones en línea
+                        <p class="text-[11px] text-accent-100/80">Historial médico, recetas e inmunizaciones en línea
                         </p>
                     </div>
                 </div>
@@ -73,13 +79,13 @@
                 <!-- Overlapping Avatar Circles -->
                 <div class="flex -space-x-2 shrink-0">
                     <div
-                        class="w-8 h-8 rounded-full bg-emerald-700 border-2 border-teal-850 flex items-center justify-center text-xs">
+                        class="w-8 h-8 rounded-full bg-accent-700 border-2 border-accent-850 flex items-center justify-center text-xs">
                         🐶</div>
                     <div
-                        class="w-8 h-8 rounded-full bg-emerald-600 border-2 border-teal-850 flex items-center justify-center text-xs">
+                        class="w-8 h-8 rounded-full bg-accent-600 border-2 border-accent-850 flex items-center justify-center text-xs">
                         🐱</div>
                     <div
-                        class="w-8 h-8 rounded-full bg-red-500 border-2 border-teal-850 flex items-center justify-center text-xs text-white">
+                        class="w-8 h-8 rounded-full bg-red-500 border-2 border-accent-850 flex items-center justify-center text-xs text-white">
                         ❤️</div>
                 </div>
             </div>
@@ -92,7 +98,7 @@
             <!-- Top Brand Header -->
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 rounded-2xl bg-teal-850 flex items-center justify-center text-white text-xl shadow-md">
+                    class="w-10 h-10 rounded-2xl bg-linear-to-br from-brand-500 to-red-600 flex items-center justify-center text-white text-xl shadow-md shadow-brand-600/30">
                     🐾
                 </div>
                 <div>
@@ -182,7 +188,7 @@
                             <input id="login-email" type="email" autocomplete="email"
                                 placeholder="ejemplo@correo.com" [formField]="usuarioFormulario.email"
                                 [class.border-red-300]="usuarioFormulario.email().touched() && usuarioFormulario.email().errors().length > 0"
-                                class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-850 focus:bg-white transition-all" />
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-850 focus:bg-white transition-all" />
                         </div>
                         @if (usuarioFormulario.email().touched() && usuarioFormulario.email().errors().length) {
                         <p class="mt-1 text-[11px] text-red-600">{{ usuarioFormulario.email().errors()[0].message }}</p>
@@ -205,7 +211,7 @@
                                 autocomplete="current-password" placeholder="••••••••••••"
                                 [formField]="usuarioFormulario.password"
                                 [class.border-red-300]="usuarioFormulario.password().touched() && usuarioFormulario.password().errors().length > 0"
-                                class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-850 focus:bg-white transition-all" />
+                                class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-accent-850 focus:bg-white transition-all" />
                             <button type="button" (click)="mostrarPassword.set(!mostrarPassword())"
                                 [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
                                 class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
@@ -234,16 +240,16 @@
                     <div class="flex items-center justify-between pt-1">
                         <label class="flex items-center text-xs text-slate-600 gap-2 cursor-pointer select-none">
                             <input type="checkbox"
-                                class="w-4 h-4 rounded border-slate-300 text-teal-850 focus:ring-teal-850" />
+                                class="w-4 h-4 rounded border-slate-300 text-accent-850 focus:ring-accent-850" />
                             Recordarme en este equipo
                         </label>
-                        <a href="#" class="text-xs font-bold text-teal-850 hover:underline">¿Olvidaste tu
+                        <a href="#" class="text-xs font-bold text-brand-700 hover:underline">¿Olvidaste tu
                             contraseña?</a>
                     </div>
 
                     <!-- Submit Button -->
                     <button type="submit" [disabled]="cargando()"
-                        class="w-full mt-4 py-3 px-6 bg-teal-850 hover:bg-teal-900 text-white font-bold text-sm rounded-full shadow-lg shadow-teal-850/30 flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="w-full mt-4 py-3 px-6 bg-linear-to-r from-brand-500 to-red-600 hover:from-brand-600 hover:to-red-700 text-white font-bold text-sm rounded-full shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed">
                         @if (cargando()) {
                         <span
                             class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
@@ -262,7 +268,7 @@
                 <div class="text-center mt-6 text-xs text-slate-500">
                     ¿Aún no tienes una cuenta registrada?
                     <a routerLink="/register"
-                        class="font-bold text-teal-850 hover:underline inline-flex items-center gap-1 ml-1 cursor-pointer">
+                        class="font-bold text-brand-700 hover:underline inline-flex items-center gap-1 ml-1 cursor-pointer">
                         Crear una cuenta
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

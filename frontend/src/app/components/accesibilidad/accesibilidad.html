@@ -1,0 +1,260 @@
+<!-- Definiciones de filtros para los modos de visión -->
+<svg class="pointer-events-none absolute h-0 w-0" aria-hidden="true" focusable="false">
+    <defs>
+        <filter id="a11y-protanopia" color-interpolation-filters="linearRGB">
+            <feColorMatrix type="matrix"
+                values="0.567 0.433 0     0 0
+                        0.558 0.442 0     0 0
+                        0     0.242 0.758 0 0
+                        0     0     0     1 0" />
+        </filter>
+        <filter id="a11y-deuteranopia" color-interpolation-filters="linearRGB">
+            <feColorMatrix type="matrix"
+                values="0.625 0.375 0     0 0
+                        0.7   0.3   0     0 0
+                        0     0.3   0.7   0 0
+                        0     0     0     1 0" />
+        </filter>
+        <filter id="a11y-tritanopia" color-interpolation-filters="linearRGB">
+            <feColorMatrix type="matrix"
+                values="0.95 0.05  0     0 0
+                        0    0.433 0.567 0 0
+                        0    0.475 0.525 0 0
+                        0    0     0     1 0" />
+        </filter>
+    </defs>
+</svg>
+
+<div class="fixed bottom-5 right-5 z-[70] flex flex-col items-end font-sans">
+
+    <!-- Panel -->
+    @if (abierto()) {
+    <div #panel id="panel-accesibilidad" role="dialog" aria-modal="false"
+        aria-label="Opciones de accesibilidad" aria-labelledby="titulo-accesibilidad"
+        class="a11y-panel mb-4 w-[min(22rem,calc(100vw-2.5rem))] overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-2xl shadow-slate-900/20 ring-1 ring-slate-900/5 backdrop-blur-xl">
+
+        <!-- Cabecera -->
+        <div class="relative overflow-hidden bg-gradient-to-r from-brand-500 via-brand-600 to-red-600 px-5 py-4 text-white">
+            <div class="a11y-brillo absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/25 blur-2xl"></div>
+            <div class="relative flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/20 text-xl shadow-inner ring-1 ring-white/30">
+                        ♿
+                    </div>
+                    <div>
+                        <h2 id="titulo-accesibilidad" class="text-base font-extrabold leading-tight">Accesibilidad</h2>
+                        <p class="text-[11px] font-medium text-white/85">Adapta el sitio a tu comodidad</p>
+                    </div>
+                </div>
+                <button type="button" (click)="cerrar()" aria-label="Cerrar panel de accesibilidad"
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition hover:rotate-90 hover:bg-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="a11y-contenido max-h-[min(70vh,32rem)] space-y-4 overflow-y-auto px-4 py-4">
+
+            <!-- Tamaño de texto -->
+            <section aria-labelledby="a11y-texto">
+                <div class="mb-2 flex items-center justify-between">
+                    <h3 id="a11y-texto"
+                        class="text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">Tamaño de texto
+                    </h3>
+                    <span
+                        class="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-700">{{ servicio.escalaTexto() }}%</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button type="button" (click)="servicio.reducirTexto()" [disabled]="!servicio.puedeReducir()"
+                        aria-label="Reducir tamaño del texto"
+                        class="a11y-boton-suave flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-slate-50 text-sm font-bold text-slate-700 transition hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-40">
+                        <span class="text-xs">A−</span> Menos
+                    </button>
+                    <button type="button" (click)="servicio.agrandarTexto()" [disabled]="!servicio.puedeAgrandar()"
+                        aria-label="Aumentar tamaño del texto"
+                        class="a11y-boton-suave flex h-11 flex-1 items-center justify-center gap-1.5 rounded-2xl bg-gradient-to-r from-brand-500 to-brand-600 text-sm font-bold text-white shadow-lg shadow-brand-600/25 transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-40">
+                        <span class="text-base leading-none">A+</span> Más
+                    </button>
+                </div>
+            </section>
+
+            <!-- Interruptores -->
+            <section aria-labelledby="a11y-ajustes">
+                <h3 id="a11y-ajustes"
+                    class="mb-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">Lectura y
+                    navegación</h3>
+                <div class="grid gap-2">
+
+                    <button type="button" (click)="servicio.alternar('fuenteLegible')"
+                        [attr.aria-pressed]="servicio.ajustes().fuenteLegible"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().fuenteLegible"
+                        [class.border-slate-200]="!servicio.ajustes().fuenteLegible"
+                        [class.bg-white]="!servicio.ajustes().fuenteLegible">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">🔤</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Fuente
+                                legible</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Letras
+                                más claras de distinguir</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                    <button type="button" (click)="servicio.alternar('espaciado')"
+                        [attr.aria-pressed]="servicio.ajustes().espaciado"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().espaciado"
+                        [class.border-slate-200]="!servicio.ajustes().espaciado"
+                        [class.bg-white]="!servicio.ajustes().espaciado">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">↔️</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Espaciado
+                                de texto</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Más
+                                aire entre líneas y letras</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                    <button type="button" (click)="servicio.alternar('resaltarEnlaces')"
+                        [attr.aria-pressed]="servicio.ajustes().resaltarEnlaces"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().resaltarEnlaces"
+                        [class.border-slate-200]="!servicio.ajustes().resaltarEnlaces"
+                        [class.bg-white]="!servicio.ajustes().resaltarEnlaces">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">🔗</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Resaltar
+                                enlaces</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Subrayado
+                                visible</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                    <button type="button" (click)="servicio.alternar('cursorGrande')"
+                        [attr.aria-pressed]="servicio.ajustes().cursorGrande"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().cursorGrande"
+                        [class.border-slate-200]="!servicio.ajustes().cursorGrande"
+                        [class.bg-white]="!servicio.ajustes().cursorGrande">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">🖱️</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Cursor
+                                grande</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Puntero
+                                más visible</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                    <button type="button" (click)="servicio.alternar('reducirMovimiento')"
+                        [attr.aria-pressed]="servicio.ajustes().reducirMovimiento"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().reducirMovimiento"
+                        [class.border-slate-200]="!servicio.ajustes().reducirMovimiento"
+                        [class.bg-white]="!servicio.ajustes().reducirMovimiento">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">⏸️</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Detener
+                                animaciones</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Reduce
+                                el movimiento</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                    <button type="button" (click)="servicio.alternar('altoContraste')"
+                        [attr.aria-pressed]="servicio.ajustes().altoContraste"
+                        class="a11y-opcion group flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition"
+                        [class.a11y-opcion-activa]="servicio.ajustes().altoContraste"
+                        [class.border-slate-200]="!servicio.ajustes().altoContraste"
+                        [class.bg-white]="!servicio.ajustes().altoContraste">
+                        <span
+                            class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent-50 text-base text-accent-700 transition group-[.a11y-opcion-activa]:bg-white/20 group-[.a11y-opcion-activa]:text-white">🌗</span>
+                        <span class="min-w-0 flex-1">
+                            <span class="block text-xs font-bold text-slate-800 group-[.a11y-opcion-activa]:text-white">Alto
+                                contraste</span>
+                            <span
+                                class="block text-[10px] text-slate-500 group-[.a11y-opcion-activa]:text-white/80">Fondo
+                                oscuro y textos claros</span>
+                        </span>
+                        <span class="a11y-pastilla" aria-hidden="true"></span>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- Visión -->
+            <section aria-labelledby="a11y-vision">
+                <h3 id="a11y-vision"
+                    class="mb-2 text-[10px] font-extrabold uppercase tracking-[0.14em] text-slate-500">Filtros de
+                    visión</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    @for (opcion of opcionesVision; track opcion.valor) {
+                    <button type="button" (click)="elegirVision(opcion.valor)"
+                        [attr.aria-pressed]="servicio.ajustes().vision === opcion.valor"
+                        class="a11y-vision group flex items-center gap-2 rounded-2xl border px-2.5 py-2 text-left transition"
+                        [class.a11y-vision-activa]="servicio.ajustes().vision === opcion.valor"
+                        [class.border-slate-200]="servicio.ajustes().vision !== opcion.valor"
+                        [class.bg-white]="servicio.ajustes().vision !== opcion.valor">
+                        <span class="h-3 w-3 shrink-0 rounded-full ring-2 ring-white/70"
+                            [style.background-color]="opcion.color"></span>
+                        <span class="min-w-0">
+                            <span
+                                class="a11y-vision-etiqueta block truncate text-[11px] font-bold text-slate-800 group-[.a11y-vision-activa]:text-white">{{ opcion.etiqueta }}</span>
+                            <span
+                                class="a11y-vision-pista block truncate text-[9px] text-slate-500 group-[.a11y-vision-activa]:text-white/80">{{ opcion.pista }}</span>
+                        </span>
+                    </button>
+                    }
+                </div>
+            </section>
+
+            <!-- Restablecer -->
+            <button type="button" (click)="servicio.restablecer()" [disabled]="!servicio.activos()"
+                class="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-2.5 text-xs font-bold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 1 0 3-6.7" />
+                    <path d="M3 4v5h5" />
+                </svg>
+                Restablecer todo
+            </button>
+        </div>
+    </div>
+    }
+
+    <!-- Botón flotante -->
+    <button #boton type="button" (click)="alternarPanel()" [attr.aria-expanded]="abierto()"
+        aria-controls="panel-accesibilidad" aria-label="Abrir opciones de accesibilidad"
+        class="a11y-fab group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 via-brand-600 to-red-600 text-white shadow-xl shadow-red-900/30 ring-4 ring-white/70 transition-transform duration-300 hover:scale-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent-400">
+        <span class="a11y-fab-pulso absolute inset-0 rounded-full" aria-hidden="true"></span>
+        @if (abierto()) {
+        <svg class="relative h-6 w-6 transition-transform duration-300" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+        } @else {
+        <svg class="relative h-7 w-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+                d="M12 2.5a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8zM21 8.2c.4 0 .75.34.75.8 0 .4-.3.74-.7.79l-5.05.72v3.24l2.6 6.16a.8.8 0 0 1-1.48.62l-2.5-5.92h-2.24l-2.5 5.92a.8.8 0 0 1-1.48-.62l2.6-6.16v-3.24l-5.05-.72a.79.79 0 0 1-.7-.79c0-.46.35-.8.75-.8h3.6c.9 0 1.7.6 1.95 1.46l.15.54h2.1l.15-.54A2.02 2.02 0 0 1 17.4 8.2H21z" />
+        </svg>
+        }
+    </button>
+</div>
