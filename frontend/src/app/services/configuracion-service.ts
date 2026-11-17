@@ -28,7 +28,7 @@ export class ConfiguracionService {
             email: '',
             telefono: '',
             dni: '',
-            sede: 'Sede Central Los Olivos',
+            sede: 'Sede Central - San Carlos',
             notificacionesCitas: true,
             notificacionesVacunas: true,
             notificacionesPagos: false,

@@ -14,7 +14,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 10,
         descripcion:
             'Alimento super premium con salmón y omega 3 para cuidar la piel sensible y mantener un pelaje brillante.',
-        emoji: '🐟',
+        emoji: '',
         imagen: 'images/cambo_alimento_seco.jpg',
     },
     {
@@ -25,7 +25,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 8,
         descripcion:
             'Fórmula balanceada con cordero para cachorros de razas medianas y grandes en etapa de crecimiento.',
-        emoji: '🐶',
+        emoji: '',
         imagen: 'images/cambo_cachorro_cordero.webp',
     },
     {
@@ -36,7 +36,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 6,
         descripcion:
             'Promoción 2x1: dos bolsas de alimento super premium con cordero para perros adultos de razas medianas y grandes.',
-        emoji: '🎁',
+        emoji: '',
         imagen: 'images/cambo_comida_adultos_2x1.jpg',
     },
     {
@@ -47,7 +47,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 24,
         descripcion:
             'Alimento húmedo para gatos esterilizados con pollo, formulado para el control de peso y cuidado urinario.',
-        emoji: '🐱',
+        emoji: '',
         imagen: 'images/cambo_gatos.jpg',
     },
     {
@@ -58,7 +58,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 18,
         descripcion:
             'Lata hipoalergénica para cachorros con cordero y arroz, ideal para estómagos sensibles.',
-        emoji: '🥫',
+        emoji: '',
         imagen: 'images/cambo_lata_cachorro.jpg',
     },
     {
@@ -69,7 +69,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 9,
         descripcion:
             'Alimento super premium con cordero para perros adultos de razas medianas y grandes.',
-        emoji: '🦴',
+        emoji: '',
         imagen: 'images/cambo__audlto_cordero.webp',
     },
 
@@ -82,7 +82,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 15,
         descripcion:
             'Peluche de felpa con textura suave y sonido interno para estimular el juego y reducir el estrés.',
-        emoji: '🧸',
+        emoji: '',
         imagen: 'images/juguete.webp',
     },
     {
@@ -93,7 +93,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 20,
         descripcion:
             'Juguete interactivo con plumas y cascabel para despertar el instinto cazador de los felinos.',
-        emoji: '🪶',
+        emoji: '',
         imagen: 'images/juguete_gatos.webp',
     },
 
@@ -106,7 +106,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 12,
         descripcion:
             'Cepillo con cerdas de acero que elimina el pelo suelto, los nudos y el exceso de pelo muerto.',
-        emoji: '🪮',
+        emoji: '',
         imagen: 'images/cepillo_perros.webp',
     },
     {
@@ -117,7 +117,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 14,
         descripcion:
             'Cepillo de doble cara con cerdas de nylon y silicona para estimular los aceites naturales del pelaje.',
-        emoji: '🪥',
+        emoji: '',
         imagen: 'images/cepillo_2.webp',
     },
     {
@@ -128,7 +128,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 16,
         descripcion:
             'Pasta dental sabor vainilla con cepillo y aplicador para el control del sarro y la placa bacteriana.',
-        emoji: '🦷',
+        emoji: '',
         imagen: 'images/kid_dental_sabor_vainilla.webp',
     },
     {
@@ -139,7 +139,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 11,
         descripcion:
             'Cristales desodorantes con bicarbonato y aceites esenciales que neutralizan los olores del arenero.',
-        emoji: '🌸',
+        emoji: '',
         imagen: 'images/neutralizador_olores_gatos.webp',
     },
     {
@@ -150,7 +150,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 25,
         descripcion:
             'Toallitas limpiadoras con aroma very berry para pelo y patas. Presentación de 100 unidades.',
-        emoji: '🧻',
+        emoji: '',
         imagen: 'images/panos_limpiez.webp',
     },
     {
@@ -161,7 +161,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 25,
         descripcion:
             'Toallitas nutritivas con aroma sweet chamomile para el cuidado diario del pelaje. 100 unidades.',
-        emoji: '🧴',
+        emoji: '',
         imagen: 'images/panos_limpieza2.webp',
     },
 
@@ -174,7 +174,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 13,
         descripcion:
             'Spray dental con bicarbonato que ayuda a reducir la placa y el sarro sin necesidad de cepillado.',
-        emoji: '💊',
+        emoji: '',
         imagen: 'images/spray_control_sarro.webp',
     },
 
@@ -187,7 +187,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 7,
         descripcion:
             'Bolso ergonómico con ventilación, correa ajustable y base acolchada para perros y gatos pequeños.',
-        emoji: '🎒',
+        emoji: '',
         imagen: 'images/bolso_porta_mascotas.webp',
     },
     {
@@ -198,7 +198,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 10,
         descripcion:
             'Cama acolchada color chocolate con bordes elevados y base antideslizante para descanso profundo.',
-        emoji: '🛏️',
+        emoji: '',
         imagen: 'images/cama_pequena.webp',
     },
     {
@@ -209,7 +209,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 8,
         descripcion:
             'Hamaca de ventosa para ventana con superficie de felpa y estructura resistente para gatos.',
-        emoji: '🐈',
+        emoji: '',
         imagen: 'images/cama_suspendida_gatos.webp',
     },
     {
@@ -220,7 +220,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 9,
         descripcion:
             'Casaca acolchada reversible negro/rojo con cierre y orificio para el arnés. Ideal para días fríos.',
-        emoji: '🧥',
+        emoji: '',
         imagen: 'images/casaca_reversible.webp',
     },
     {
@@ -231,7 +231,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 15,
         descripcion:
             'Collar tejido ajustable con broche de seguridad y dije decorativo para gatos.',
-        emoji: '🎀',
+        emoji: '',
         imagen: 'images/collar_gatos.webp',
     },
     {
@@ -242,7 +242,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 12,
         descripcion:
             'Collar de nylon resistente con broche de liberación rápida y argolla metálica para paseo diario.',
-        emoji: '🟢',
+        emoji: '',
         imagen: 'images/collar_perro.webp',
     },
     {
@@ -253,7 +253,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 12,
         descripcion:
             'Collar de nylon acolchado en tono camel con broche de seguridad y argolla para correa.',
-        emoji: '🟤',
+        emoji: '',
         imagen: 'images/collar_perro2.webp',
     },
     {
@@ -264,7 +264,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 9,
         descripcion:
             'Arnés de malla acolchada con ajuste regulable y argolla dorsal para paseos cómodos y seguros.',
-        emoji: '🦺',
+        emoji: '',
         imagen: 'images/pechera_terracota.webp',
     },
     {
@@ -275,7 +275,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 7,
         descripcion:
             'Arnés ergonómico acolchado con bandas reflectivas, cierre de seguridad y argolla metálica.',
-        emoji: '🖤',
+        emoji: '',
         imagen: 'images/Pechera2.webp',
     },
     {
@@ -286,7 +286,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 8,
         descripcion:
             'Arnés de tela estampada escocés con broches regulables y argolla metálica para paseo.',
-        emoji: '🏁',
+        emoji: '',
         imagen: 'images/pechera_escocesa.webp',
     },
     {
@@ -297,7 +297,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
         stock: 20,
         descripcion:
             'Placa metálica con código QR para identificación y contacto inmediato del tutor.',
-        emoji: '🔖',
+        emoji: '',
         imagen: 'images/placa_identificacion_gatos.webp',
     },
 ];
