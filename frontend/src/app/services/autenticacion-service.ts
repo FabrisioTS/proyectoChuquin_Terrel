@@ -4,6 +4,11 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import {
+    CambiarPassword,
+    MensajeRespuesta,
+    RecuperarPasswordRespuesta,
+    RecuperarPasswordSolicitud,
+    RestablecerPassword,
     TokenResponse,
     UsuarioLogin,
     UsuarioRegistro,
@@ -53,6 +58,26 @@ export class AutenticacionService {
             tap((respuesta) => this.guardarSesion(respuesta)),
             catchError(this.manejadorErrores),
         );
+    }
+
+    recuperar_password(
+        datos: RecuperarPasswordSolicitud,
+    ): Observable<RecuperarPasswordRespuesta> {
+        return this.http
+            .post<RecuperarPasswordRespuesta>(`${this.API_URL}/recuperar-password`, datos)
+            .pipe(catchError(this.manejadorErrores));
+    }
+
+    restablecer_password(datos: RestablecerPassword): Observable<MensajeRespuesta> {
+        return this.http
+            .post<MensajeRespuesta>(`${this.API_URL}/restablecer-password`, datos)
+            .pipe(catchError(this.manejadorErrores));
+    }
+
+    cambiar_password(datos: CambiarPassword): Observable<MensajeRespuesta> {
+        return this.http
+            .post<MensajeRespuesta>(`${this.API_URL}/cambiar-password`, datos)
+            .pipe(catchError(this.manejadorErrores));
     }
 
     obtener_perfil(): Observable<UsuarioResponse> {

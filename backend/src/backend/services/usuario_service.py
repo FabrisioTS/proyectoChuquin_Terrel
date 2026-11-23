@@ -1,15 +1,25 @@
+import secrets
+
+import jwt
 import pyodbc
 from fastapi import HTTPException, status
 
 from ..core.segurity import (
     crear_token_acceso,
+    crear_token_recuperacion,
+    decodificar_token_recuperacion,
     hash_password,
+    huella_password,
     necesita_rehash,
     verificar_password,
 )
 from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario_esquema import (
+    CambiarPassword,
+    RecuperarPasswordRespuesta,
+    RecuperarPasswordSolicitud,
+    RestablecerPassword,
     TokenResponse,
     UsuarioLogin,
     UsuarioRegistro,
@@ -95,3 +105,87 @@ class UsuarioService:
             )
 
         return usuario
+
+    def solicitar_recuperacion(
+        self, datos: RecuperarPasswordSolicitud
+    ) -> RecuperarPasswordRespuesta:
+        """Verifica correo + DNI y entrega un token temporal de un solo uso."""
+        usuario = self.usuario_repositorio.obtener_usuario_por_email(datos.email)
+
+        # Mensaje genérico: no se revela si falló el correo o el DNI.
+        if not usuario or not secrets.compare_digest(usuario.dni, datos.dni):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Los datos no coinciden con una cuenta registrada",
+            )
+
+        token = crear_token_recuperacion(
+            usuario.id, usuario.email, usuario.password_hash
+        )
+
+        return RecuperarPasswordRespuesta(
+            mensaje="Identidad verificada. Define tu nueva contraseña.",
+            token_recuperacion=token,
+        )
+
+    def restablecer_password(self, datos: RestablecerPassword) -> dict[str, str]:
+        """Valida el token de recuperación y actualiza la contraseña."""
+        error_token = HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "El enlace de recuperación es inválido o ha expirado. "
+                "Solicita uno nuevo."
+            ),
+        )
+
+        try:
+            payload = decodificar_token_recuperacion(datos.token)
+            usuario_id = int(payload.get("sub", 0))
+        except (jwt.PyJWTError, TypeError, ValueError):
+            raise error_token from None
+
+        usuario = self.usuario_repositorio.obtener_usuario_por_id(usuario_id)
+
+        if not usuario:
+            raise error_token
+
+        # La huella cambia al modificar la contraseña: el token no se reutiliza.
+        huella_token = str(payload.get("huella", ""))
+        if not secrets.compare_digest(
+            huella_password(usuario.password_hash), huella_token
+        ):
+            raise error_token
+
+        if verificar_password(datos.password, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La nueva contraseña debe ser diferente a la anterior",
+            )
+
+        self.usuario_repositorio.actualizar_password_hash(
+            usuario.id, hash_password(datos.password)
+        )
+
+        return {"mensaje": "Contraseña actualizada correctamente."}
+
+    def cambiar_password(
+        self, usuario: Usuario, datos: CambiarPassword
+    ) -> dict[str, str]:
+        """Cambio de contraseña para un usuario ya autenticado."""
+        if not verificar_password(datos.password_actual, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La contraseña actual no es correcta",
+            )
+
+        if verificar_password(datos.password, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La nueva contraseña debe ser diferente a la actual",
+            )
+
+        self.usuario_repositorio.actualizar_password_hash(
+            usuario.id, hash_password(datos.password)
+        )
+
+        return {"mensaje": "Contraseña actualizada correctamente."}

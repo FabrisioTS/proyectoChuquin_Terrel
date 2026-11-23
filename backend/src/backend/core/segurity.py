@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta, timezone
 
 import bcrypt
@@ -5,7 +6,12 @@ import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
 
-from .config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from .config import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ALGORITHM,
+    RESET_TOKEN_EXPIRE_MINUTES,
+    SECRET_KEY,
+)
 
 # Argon2id: configuración recomendada por OWASP (64 MiB, 3 iteraciones).
 _hasher = PasswordHasher(
@@ -82,3 +88,38 @@ def crear_token_acceso(usuario_id: int, email: str) -> str:
 def decodificar_token(token: str) -> dict:
     """Valida la firma y la expiración del token. Lanza jwt.PyJWTError si no es válido."""
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+
+def huella_password(hashed_password: str) -> str:
+    """Huella corta del hash actual, usada para invalidar tokens ya utilizados."""
+    return hashlib.sha256(hashed_password.encode("utf-8")).hexdigest()[:16]
+
+
+def crear_token_recuperacion(
+    usuario_id: int, email: str, password_hash: str
+) -> str:
+    """Genera un JWT de un solo uso para restablecer la contraseña.
+
+    Incluye la huella del hash actual: cuando la contraseña cambia, el token
+    deja de ser válido aunque todavía no haya expirado.
+    """
+    ahora = datetime.now(timezone.utc)
+    payload = {
+        "sub": str(usuario_id),
+        "email": email,
+        "tipo": "pwd_reset",
+        "huella": huella_password(password_hash),
+        "iat": ahora,
+        "exp": ahora + timedelta(minutes=RESET_TOKEN_EXPIRE_MINUTES),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def decodificar_token_recuperacion(token: str) -> dict:
+    """Valida el token de recuperación y comprueba que sea de ese tipo."""
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+    if payload.get("tipo") != "pwd_reset":
+        raise jwt.InvalidTokenError("Token de recuperación inválido")
+
+    return payload

@@ -5,6 +5,8 @@ import { AutenticacionService } from '../../../../services/autenticacion-service
 import { ConfiguracionService } from '../../../../services/configuracion-service';
 import { Configuracion as ConfiguracionPortal } from '../../../../interfaces/Configuracion';
 
+const PASSWORD_SEGURA = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+
 @Component({
     selector: 'app-configuracion',
     imports: [ReactiveFormsModule],
@@ -32,6 +34,27 @@ export class Configuracion {
         notificacionesVacunas: [true],
         notificacionesPagos: [false],
     });
+
+    readonly formularioPassword = this.fb.group({
+        password_actual: ['', [Validators.required, Validators.maxLength(72)]],
+        password: [
+            '',
+            [
+                Validators.required,
+                Validators.minLength(8),
+                Validators.maxLength(72),
+                Validators.pattern(PASSWORD_SEGURA),
+            ],
+        ],
+        confirmar_password: ['', [Validators.required, Validators.maxLength(72)]],
+    });
+
+    mostrarPasswordActual = false;
+    mostrarPasswordNueva = false;
+    mostrarPasswordConfirmacion = false;
+    cambiandoPassword = false;
+    errorPassword: string | null = null;
+    exitoPassword: string | null = null;
 
     constructor() {
         const usuario = this.autenticacionService.usuarioActual();
@@ -89,5 +112,57 @@ export class Configuracion {
         } catch {
             // Los cambios ya quedaron guardados.
         }
+    }
+
+    cambiarPassword(): void {
+        this.errorPassword = null;
+        this.exitoPassword = null;
+
+        if (this.formularioPassword.invalid) {
+            this.formularioPassword.markAllAsTouched();
+            this.errorPassword = 'Revisa los campos de contraseña antes de continuar.';
+            return;
+        }
+
+        const valor = this.formularioPassword.getRawValue();
+        const passwordNueva = valor.password ?? '';
+        const confirmacion = valor.confirmar_password ?? '';
+
+        if (passwordNueva !== confirmacion) {
+            this.errorPassword = 'Las contraseñas nuevas no coinciden.';
+            return;
+        }
+
+        this.cambiandoPassword = true;
+
+        this.autenticacionService
+            .cambiar_password({
+                password_actual: valor.password_actual ?? '',
+                password: passwordNueva,
+                confirmar_password: confirmacion,
+            })
+            .subscribe({
+                next: async (respuesta) => {
+                    this.cambiandoPassword = false;
+                    this.exitoPassword = respuesta.mensaje;
+                    this.formularioPassword.reset();
+
+                    try {
+                        const { default: Swal } = await import('sweetalert2');
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Contraseña actualizada',
+                            text: 'Tu contraseña se cambió correctamente. Úsala en tu próximo inicio de sesión.',
+                            confirmButtonColor: '#c2410c',
+                        });
+                    } catch {
+                        // El cambio ya se guardó aunque el modal no esté disponible.
+                    }
+                },
+                error: (err: Error) => {
+                    this.cambiandoPassword = false;
+                    this.errorPassword = err.message;
+                },
+            });
     }
 }

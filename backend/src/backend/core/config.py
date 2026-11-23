@@ -69,6 +69,9 @@ ALGORITHM = _variable("ALGORITHM", "HS256")
 # Tiempo de vida del token de acceso (en minutos).
 ACCESS_TOKEN_EXPIRE_MINUTES = int(_variable("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
+# Tiempo de vida del token usado para restablecer la contraseña (en minutos).
+RESET_TOKEN_EXPIRE_MINUTES = int(_variable("RESET_TOKEN_EXPIRE_MINUTES", "10"))
+
 # Datos de conexión a SQL Server.
 DB_SERVER = _variable("DB_SERVER", "localhost")
 DB_NAME = _variable("DB_NAME", "veterinaria_db")

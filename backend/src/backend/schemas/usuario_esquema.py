@@ -31,6 +31,21 @@ def _limpiar_texto(valor):
     return valor
 
 
+def _validar_password_segura(valor):
+    """Reglas compartidas por el registro, la recuperación y el cambio de clave."""
+    if not isinstance(valor, str):
+        return valor
+
+    if len(valor) < 8:
+        raise ValueError("La contraseña debe tener al menos 8 caracteres")
+    if len(valor) > 72:
+        raise ValueError("La contraseña no debe superar los 72 caracteres")
+    if not PATRON_PASSWORD.match(valor):
+        raise ValueError("La contraseña debe incluir al menos una letra y un número")
+
+    return valor
+
+
 # 1. Lo que RECIBE FastAPI para registrar
 class UsuarioRegistro(BaseModel):
     nombres: str = Field(min_length=2, max_length=100)
@@ -97,17 +112,7 @@ class UsuarioRegistro(BaseModel):
     @field_validator("password", "confirmar_password", mode="before")
     @classmethod
     def validar_password(cls, valor, info: ValidationInfo):
-        if not isinstance(valor, str):
-            return valor
-
-        if len(valor) < 8:
-            raise ValueError("La contraseña debe tener al menos 8 caracteres")
-        if len(valor) > 72:
-            raise ValueError("La contraseña no debe superar los 72 caracteres")
-        if not PATRON_PASSWORD.match(valor):
-            raise ValueError("La contraseña debe incluir al menos una letra y un número")
-
-        return valor
+        return _validar_password_segura(valor)
 
     @model_validator(mode="after")
     def verificar_password_coincide(self):
@@ -152,3 +157,72 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     usuario: UsuarioResponse
+
+
+# 5. Recuperación: verificación de identidad con correo + DNI
+class RecuperarPasswordSolicitud(BaseModel):
+    email: EmailStr
+    dni: str = Field(min_length=8, max_length=8)
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalizar_email(cls, valor):
+        valor = _normalizar_email(valor)
+
+        if isinstance(valor, str) and not PATRON_EMAIL.match(valor):
+            raise ValueError(
+                'Ingresa un correo electrónico válido. Debe incluir "@" y un dominio.'
+            )
+
+        return valor
+
+    @field_validator("dni", mode="before")
+    @classmethod
+    def validar_dni(cls, valor):
+        valor = _limpiar_texto(valor)
+
+        if isinstance(valor, str) and not PATRON_DNI.match(valor):
+            raise ValueError("El DNI debe tener exactamente 8 dígitos numéricos")
+
+        return valor
+
+
+class RecuperarPasswordRespuesta(BaseModel):
+    mensaje: str
+    token_recuperacion: str
+
+
+# 6. Nueva contraseña usando el token de recuperación
+class RestablecerPassword(BaseModel):
+    token: str = Field(min_length=10)
+    password: str = Field(min_length=8, max_length=72)
+    confirmar_password: str = Field(min_length=8, max_length=72)
+
+    @field_validator("password", "confirmar_password", mode="before")
+    @classmethod
+    def validar_password(cls, valor):
+        return _validar_password_segura(valor)
+
+    @model_validator(mode="after")
+    def verificar_password_coincide(self):
+        if self.password != self.confirmar_password:
+            raise ValueError("Las contraseñas no coinciden")
+        return self
+
+
+# 7. Cambio de contraseña para usuarios autenticados
+class CambiarPassword(BaseModel):
+    password_actual: str = Field(min_length=1, max_length=72)
+    password: str = Field(min_length=8, max_length=72)
+    confirmar_password: str = Field(min_length=8, max_length=72)
+
+    @field_validator("password", "confirmar_password", mode="before")
+    @classmethod
+    def validar_password(cls, valor):
+        return _validar_password_segura(valor)
+
+    @model_validator(mode="after")
+    def verificar_password_coincide(self):
+        if self.password != self.confirmar_password:
+            raise ValueError("Las contraseñas no coinciden")
+        return self

@@ -6,6 +6,10 @@ from ..database.conection import get_db
 from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario_esquema import (
+    CambiarPassword,
+    RecuperarPasswordRespuesta,
+    RecuperarPasswordSolicitud,
+    RestablecerPassword,
     TokenResponse,
     UsuarioLogin,
     UsuarioRegistro,
@@ -38,6 +42,44 @@ def login(
     repositorio = UsuarioRepository(conexion)
     servicio = UsuarioService(repositorio)
     return servicio.iniciar_sesion(datos)
+
+
+@usuario_router.post(
+    "/recuperar-password",
+    response_model=RecuperarPasswordRespuesta,
+    status_code=status.HTTP_200_OK,
+)
+def solicitar_recuperacion(
+    datos: RecuperarPasswordSolicitud,
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    """Verifica correo + DNI y devuelve un token temporal para cambiar la clave."""
+    repositorio = UsuarioRepository(conexion)
+    servicio = UsuarioService(repositorio)
+    return servicio.solicitar_recuperacion(datos)
+
+
+@usuario_router.post("/restablecer-password", status_code=status.HTTP_200_OK)
+def restablecer_password(
+    datos: RestablecerPassword,
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    """Cambia la contraseña usando el token entregado por recuperar-password."""
+    repositorio = UsuarioRepository(conexion)
+    servicio = UsuarioService(repositorio)
+    return servicio.restablecer_password(datos)
+
+
+@usuario_router.post("/cambiar-password", status_code=status.HTTP_200_OK)
+def cambiar_password(
+    datos: CambiarPassword,
+    usuario_actual: Usuario = Depends(get_current_user),
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    """Cambio de contraseña para usuarios autenticados."""
+    repositorio = UsuarioRepository(conexion)
+    servicio = UsuarioService(repositorio)
+    return servicio.cambiar_password(usuario_actual, datos)
 
 
 @usuario_router.get(
