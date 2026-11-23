@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HistorialService } from '../../../../services/historial-service';
 import { MascotasService } from '../../../../services/mascotas-service';
 import { BusquedaService } from '../../../../services/busqueda-service';
+import { AutenticacionService } from '../../../../services/autenticacion-service';
 import { Historial as HistorialRegistro } from '../../../../interfaces/Historial';
 import { formatearFecha, hoyISO } from '../../../../utils/fechas';
 
@@ -16,6 +17,7 @@ export class Historial {
     private historialService = inject(HistorialService);
     private mascotasService = inject(MascotasService);
     private busquedaService = inject(BusquedaService);
+    private autenticacionService = inject(AutenticacionService);
     private fb = inject(FormBuilder);
 
     readonly mascotas = this.mascotasService.mascotas;
@@ -23,6 +25,11 @@ export class Historial {
     readonly mascotaFiltro = signal(0);
     readonly expandido = signal<number | null>(null);
     readonly mostrarFormulario = signal(false);
+    readonly guardando = signal(false);
+    readonly error = signal<string | null>(null);
+
+    /** El propietario solo consulta; el historial lo escribe el veterinario. */
+    readonly puedeEscribir = this.autenticacionService.esVeterinario;
 
     readonly registros = computed(() => {
         const mascotaId = this.mascotaFiltro();
@@ -53,6 +60,7 @@ export class Historial {
     });
 
     abrirFormulario(): void {
+        this.error.set(null);
         this.formulario.reset({
             mascotaId: this.mascotas()[0]?.id ?? 0,
             fecha: hoyISO(),
@@ -79,25 +87,29 @@ export class Historial {
         const mascota = this.mascotasService.obtener(Number(valor.mascotaId));
 
         if (!mascota) {
+            this.error.set('Selecciona una mascota válida.');
             return;
         }
 
-        this.historialService.crear(
-            {
-                mascotaId: mascota.id,
-                fecha: valor.fecha ?? hoyISO(),
-                doctor: (valor.doctor ?? '').trim(),
-                motivo: (valor.motivo ?? '').trim(),
-                diagnostico: (valor.diagnostico ?? '').trim(),
-                tratamiento: (valor.tratamiento ?? '').trim(),
-                receta: (valor.receta ?? '').trim(),
-            },
-            mascota.nombre,
-        );
-
-        this.cerrarFormulario();
+        this.guardando.set(true);
+        this.error.set(null);
 
         try {
+            await this.historialService.crear(
+                {
+                    mascotaId: mascota.id,
+                    fecha: valor.fecha ?? hoyISO(),
+                    doctor: (valor.doctor ?? '').trim(),
+                    motivo: (valor.motivo ?? '').trim(),
+                    diagnostico: (valor.diagnostico ?? '').trim(),
+                    tratamiento: (valor.tratamiento ?? '').trim(),
+                    receta: (valor.receta ?? '').trim(),
+                },
+                mascota.nombre,
+            );
+
+            this.cerrarFormulario();
+
             const { default: Swal } = await import('sweetalert2');
             await Swal.fire({
                 icon: 'success',
@@ -105,8 +117,10 @@ export class Historial {
                 text: 'El historial médico se actualizó correctamente.',
                 confirmButtonColor: '#c2410c',
             });
-        } catch {
-            // El registro ya quedó guardado.
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.guardando.set(false);
         }
     }
 
@@ -130,7 +144,13 @@ export class Historial {
             // Sin modal, se elimina directamente.
         }
 
-        this.historialService.eliminar(registro.id);
+        this.error.set(null);
+
+        try {
+            await this.historialService.eliminar(registro.id);
+        } catch (error) {
+            this.error.set((error as Error).message);
+        }
     }
 
     cambiarMascota(evento: Event): void {

@@ -1,3 +1,5 @@
+export type RolUsuario = 'propietario' | 'veterinario' | 'admin';
+
 export interface UsuarioRegistro {
     nombres: string;
     apellidos: string;
@@ -22,6 +24,15 @@ export interface UsuarioResponse {
     email: string;
     telefono: string;
     dni: string;
+    rol: RolUsuario;
+}
+
+
+export interface UsuarioActualizar {
+    nombres: string;
+    apellidos: string;
+    email: string;
+    telefono: string;
 }
 
 

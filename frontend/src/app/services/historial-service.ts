@@ -1,16 +1,50 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AlmacenamientoService } from './almacenamiento-service';
-import { Historial, HistorialFormulario } from '../interfaces/Historial';
-import { fechaRelativa } from '../utils/fechas';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-const CLAVE = 'portal_historial_v1';
+import { environment } from '../../environments/environment';
+import { manejarErrorHttp } from '../utils/error-http';
+import { Historial, HistorialFormulario } from '../interfaces/Historial';
+
+interface HistorialApi {
+    id: number;
+    usuario_id: number | null;
+    mascota_id: number;
+    veterinario_id: number | null;
+    mascota_nombre: string;
+    fecha: string;
+    doctor: string | null;
+    motivo: string | null;
+    diagnostico: string | null;
+    tratamiento: string | null;
+    receta: string | null;
+}
+
+function mapearHistorial(api: HistorialApi): Historial {
+    return {
+        id: api.id,
+        mascotaId: api.mascota_id,
+        mascotaNombre: api.mascota_nombre,
+        fecha: api.fecha,
+        doctor: api.doctor ?? '',
+        motivo: api.motivo ?? '',
+        diagnostico: api.diagnostico ?? '',
+        tratamiento: api.tratamiento ?? '',
+        receta: api.receta ?? '',
+    };
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class HistorialService {
-    private almacenamiento = inject(AlmacenamientoService);
-    private _historial = signal<Historial[]>(this.almacenamiento.leer(CLAVE, this.semilla()));
+    private http = inject(HttpClient);
+    private readonly API = `${environment.apiUrl}/historial`;
+
+    private _historial = signal<Historial[]>([]);
+    readonly cargando = signal(false);
+    readonly error = signal<string | null>(null);
 
     readonly historial = this._historial.asReadonly();
     readonly total = computed(() => this._historial().length);
@@ -19,77 +53,65 @@ export class HistorialService {
         [...this._historial()].sort((a, b) => b.fecha.localeCompare(a.fecha)),
     );
 
-    crear(datos: HistorialFormulario, mascotaNombre: string): Historial {
-        const registro: Historial = {
-            ...datos,
-            id: this.siguienteId(),
-            mascotaNombre,
-        };
+    async cargar(): Promise<void> {
+        this.cargando.set(true);
+        this.error.set(null);
 
-        this._historial.update((historial) => [...historial, registro]);
-        this.persistir();
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<HistorialApi[]>(`${this.API}/`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._historial.set(datos.map(mapearHistorial));
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.cargando.set(false);
+        }
+    }
+
+    async cargarPorMascota(mascotaId: number): Promise<Historial[]> {
+        const datos = await firstValueFrom(
+            this.http
+                .get<HistorialApi[]>(
+                    `${environment.apiUrl}/mascotas/${mascotaId}/historial`,
+                )
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        return datos.map(mapearHistorial);
+    }
+
+    async crear(
+        datos: HistorialFormulario,
+        _mascotaNombre: string,
+    ): Promise<Historial> {
+        const api = await firstValueFrom(
+            this.http
+                .post<HistorialApi>(`${this.API}/`, {
+                    mascota_id: datos.mascotaId,
+                    fecha: datos.fecha,
+                    doctor: datos.doctor || null,
+                    motivo: datos.motivo || null,
+                    diagnostico: datos.diagnostico || null,
+                    tratamiento: datos.tratamiento || null,
+                    receta: datos.receta || null,
+                })
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        const registro = mapearHistorial(api);
+        this._historial.update((historial) => [registro, ...historial]);
         return registro;
     }
 
-    eliminar(id: number): void {
-        this._historial.update((historial) => historial.filter((item) => item.id !== id));
-        this.persistir();
-    }
-
-    private siguienteId(): number {
-        return this._historial().reduce((maximo, item) => Math.max(maximo, item.id), 0) + 1;
-    }
-
-    private persistir(): void {
-        this.almacenamiento.guardar(CLAVE, this._historial());
-    }
-
-    private semilla(): Historial[] {
-        return [
-            {
-                id: 1,
-                mascotaId: 1,
-                mascotaNombre: 'Simba',
-                fecha: fechaRelativa(-18),
-                doctor: 'Dra. Mariana Pariona',
-                motivo: 'Consulta por sensibilidad en la piel',
-                diagnostico: 'Dermatitis alérgica leve por contacto.',
-                tratamiento: 'Shampoo medicado cada 3 días por 14 días.',
-                receta: 'Clorexidina 2% shampoo. Prednisolona 5 mg por 5 días.',
-            },
-            {
-                id: 2,
-                mascotaId: 1,
-                mascotaNombre: 'Simba',
-                fecha: fechaRelativa(-60),
-                doctor: 'Dra. Mariana Pariona',
-                motivo: 'Control post-operatorio',
-                diagnostico: 'Herida quirúrgica en correcta evolución.',
-                tratamiento: 'Limpieza diaria y antibiótico por 7 días.',
-                receta: 'Amoxicilina 250 mg cada 12 horas por 7 días.',
-            },
-            {
-                id: 3,
-                mascotaId: 2,
-                mascotaNombre: 'Milo',
-                fecha: fechaRelativa(-45),
-                doctor: 'Dr. Alonso Requena',
-                motivo: 'Chequeo general y desparasitación',
-                diagnostico: 'Paciente sano, peso y constantes normales.',
-                tratamiento: 'Desparasitación interna y externa mensual.',
-                receta: 'NexGard Spectra 1 tableta mensual. Praziquantel según peso.',
-            },
-            {
-                id: 4,
-                mascotaId: 2,
-                mascotaNombre: 'Milo',
-                fecha: fechaRelativa(-120),
-                doctor: 'Dra. Mariana Pariona',
-                motivo: 'Revisión de vacunas',
-                diagnostico: 'Esquema de vacunación incompleto.',
-                tratamiento: 'Se reprograma triple felina.',
-                receta: 'Triple felina al día siguiente de la consulta.',
-            },
-        ];
+    async eliminar(id: number): Promise<void> {
+        await firstValueFrom(
+            this.http
+                .delete(`${this.API}/${id}`)
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        this._historial.update((historial) =>
+            historial.filter((item) => item.id !== id),
+        );
     }
 }

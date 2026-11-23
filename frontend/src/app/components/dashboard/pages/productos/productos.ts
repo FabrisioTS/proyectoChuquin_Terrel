@@ -107,23 +107,28 @@ export class Productos {
                 return;
             }
 
-            this.pagosService.registrar(
-                `Compra de productos (${this.cantidadTotal()} artículos)`,
-                this.total(),
-                undefined,
-                'Tarjeta',
-            );
-            this.productosService.descontarStock(items);
+            const pago = await this.pagosService.checkout(items, 'Tarjeta');
             this.productosService.vaciarCarrito();
+            await this.productosService.cargar();
 
             await Swal.fire({
                 icon: 'success',
                 title: 'Compra registrada',
-                text: 'El comprobante fue generado en la sección Pagos / Comprobantes.',
+                text: `El comprobante ${pago.codigo} fue generado en la sección Pagos / Comprobantes.`,
                 confirmButtonColor: '#c2410c',
             });
-        } catch {
-            // Si el modal falla, no se altera el carrito.
+        } catch (error) {
+            try {
+                const { default: Swal } = await import('sweetalert2');
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo completar la compra',
+                    text: (error as Error).message,
+                    confirmButtonColor: '#c2410c',
+                });
+            } catch {
+                // Sin modal no se puede informar el error.
+            }
         }
     }
 

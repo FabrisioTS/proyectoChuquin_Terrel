@@ -1,16 +1,48 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AlmacenamientoService } from './almacenamiento-service';
-import { Pago } from '../interfaces/Pago';
-import { fechaRelativa } from '../utils/fechas';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-const CLAVE = 'portal_pagos_v1';
+import { environment } from '../../environments/environment';
+import { manejarErrorHttp } from '../utils/error-http';
+import { Pago } from '../interfaces/Pago';
+import { ItemCarritoDetalle } from '../interfaces/Producto';
+
+interface PagoApi {
+    id: number;
+    usuario_id: number | null;
+    codigo: string;
+    concepto: string;
+    fecha: string;
+    monto: number;
+    metodo: string | null;
+    estado: string;
+    mascota_nombre: string | null;
+}
+
+function mapearPago(api: PagoApi): Pago {
+    return {
+        id: api.id,
+        codigo: api.codigo,
+        concepto: api.concepto,
+        fecha: api.fecha,
+        monto: api.monto,
+        metodo: api.metodo ?? '',
+        estado: api.estado as Pago['estado'],
+        mascotaNombre: api.mascota_nombre ?? undefined,
+    };
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class PagosService {
-    private almacenamiento = inject(AlmacenamientoService);
-    private _pagos = signal<Pago[]>(this.almacenamiento.leer(CLAVE, this.semilla()));
+    private http = inject(HttpClient);
+    private readonly API = `${environment.apiUrl}/pagos`;
+
+    private _pagos = signal<Pago[]>([]);
+    readonly cargando = signal(false);
+    readonly error = signal<string | null>(null);
 
     readonly pagos = this._pagos.asReadonly();
     readonly pendientes = computed(() =>
@@ -27,93 +59,54 @@ export class PagosService {
             .reduce((total, pago) => total + pago.monto, 0),
     );
 
-    registrar(
-        concepto: string,
-        monto: number,
-        mascotaNombre?: string,
-        metodo = 'Tarjeta',
-        estado: Pago['estado'] = 'Pagado',
-    ): Pago {
-        const id = this._pagos().reduce((maximo, pago) => Math.max(maximo, pago.id), 0) + 1;
-        const pago: Pago = {
-            id,
-            codigo: `PAG-${id.toString().padStart(4, '0')}`,
-            concepto,
-            fecha: fechaRelativa(0),
-            monto,
-            metodo,
-            estado,
-            mascotaNombre,
-        };
+    async cargar(): Promise<void> {
+        this.cargando.set(true);
+        this.error.set(null);
 
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<PagoApi[]>(`${this.API}/`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._pagos.set(datos.map(mapearPago));
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.cargando.set(false);
+        }
+    }
+
+    /** Envía el carrito al backend: valida stock, descuenta y genera comprobante. */
+    async checkout(
+        items: ItemCarritoDetalle[],
+        metodo = 'Tarjeta',
+    ): Promise<Pago> {
+        const api = await firstValueFrom(
+            this.http
+                .post<PagoApi>(`${this.API}/checkout`, {
+                    items: items.map((item) => ({
+                        producto_id: item.producto.id,
+                        cantidad: item.cantidad,
+                    })),
+                    metodo,
+                })
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        const pago = mapearPago(api);
         this._pagos.update((pagos) => [pago, ...pagos]);
-        this.persistir();
         return pago;
     }
 
-    marcarPagado(id: number): void {
-        this._pagos.update((pagos) =>
-            pagos.map((pago) => (pago.id === id ? { ...pago, estado: 'Pagado' } : pago)),
+    async marcarPagado(id: number): Promise<void> {
+        const api = await firstValueFrom(
+            this.http
+                .patch<PagoApi>(`${this.API}/${id}/pagar`, {})
+                .pipe(catchError(manejarErrorHttp)),
         );
-        this.persistir();
-    }
-
-    private persistir(): void {
-        this.almacenamiento.guardar(CLAVE, this._pagos());
-    }
-
-    private semilla(): Pago[] {
-        return [
-            {
-                id: 1,
-                codigo: 'PAG-0001',
-                concepto: 'Consulta dermatológica - Simba',
-                fecha: fechaRelativa(-18),
-                monto: 120,
-                metodo: 'Tarjeta',
-                estado: 'Pagado',
-                mascotaNombre: 'Simba',
-            },
-            {
-                id: 2,
-                codigo: 'PAG-0002',
-                concepto: 'Vacuna Séxtuple Canina - Simba',
-                fecha: fechaRelativa(-30),
-                monto: 85,
-                metodo: 'Efectivo',
-                estado: 'Pagado',
-                mascotaNombre: 'Simba',
-            },
-            {
-                id: 3,
-                codigo: 'PAG-0003',
-                concepto: 'Chequeo general y desparasitación - Milo',
-                fecha: fechaRelativa(-45),
-                monto: 95,
-                metodo: 'Yape',
-                estado: 'Pagado',
-                mascotaNombre: 'Milo',
-            },
-            {
-                id: 4,
-                codigo: 'PAG-0004',
-                concepto: 'Control post-operatorio - Simba',
-                fecha: fechaRelativa(1),
-                monto: 150,
-                metodo: 'Pendiente en caja',
-                estado: 'Pendiente',
-                mascotaNombre: 'Simba',
-            },
-            {
-                id: 5,
-                codigo: 'PAG-0005',
-                concepto: 'Plan Preventivo Senior - cuota mensual',
-                fecha: fechaRelativa(12),
-                monto: 79,
-                metodo: 'Débito automático',
-                estado: 'Pendiente',
-                mascotaNombre: 'Simba',
-            },
-        ];
+        const pago = mapearPago(api);
+        this._pagos.update((pagos) =>
+            pagos.map((item) => (item.id === id ? pago : item)),
+        );
     }
 }

@@ -3,6 +3,7 @@ import { Component, signal } from '@angular/core';
 import { DocumentoLegal } from './compartidos/documento-legal';
 import { ModalLegal } from './compartidos/modal-legal/modal-legal';
 import { WhatsappFlotante } from './compartidos/whatsapp-flotante/whatsapp-flotante';
+import { Carrusel } from './secciones/carrusel/carrusel';
 import { Contacto } from './secciones/contacto/contacto';
 import { Equipo } from './secciones/equipo/equipo';
 import { Footer } from './secciones/footer/footer';
@@ -20,6 +21,7 @@ import { Ubicacion } from './secciones/ubicacion/ubicacion';
   imports: [
     Navbar,
     Hero,
+    Carrusel,
     Nosotros,
     Servicios,
     Tienda,

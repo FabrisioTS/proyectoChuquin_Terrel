@@ -73,12 +73,13 @@ def necesita_rehash(hashed_password: str) -> bool:
     return True
 
 
-def crear_token_acceso(usuario_id: int, email: str) -> str:
-    """Genera un JWT firmado con el id y el email del usuario."""
+def crear_token_acceso(usuario_id: int, email: str, rol: str = "propietario") -> str:
+    """Genera un JWT firmado con el id, el email y el rol del usuario."""
     ahora = datetime.now(timezone.utc)
     payload = {
         "sub": str(usuario_id),
         "email": email,
+        "rol": rol,
         "iat": ahora,
         "exp": ahora + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
     }

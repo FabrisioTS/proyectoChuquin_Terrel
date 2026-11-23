@@ -1,20 +1,55 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AlmacenamientoService } from './almacenamiento-service';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
+import { manejarErrorHttp } from '../utils/error-http';
 import {
     EstadoRegistroSanitario,
+    TipoRegistroSanitario,
     Vacuna,
     VacunaFormulario,
 } from '../interfaces/Vacuna';
-import { diasHasta, fechaRelativa } from '../utils/fechas';
+import { diasHasta } from '../utils/fechas';
 
-const CLAVE = 'portal_vacunas_v1';
+interface VacunaApi {
+    id: number;
+    usuario_id: number | null;
+    mascota_id: number;
+    mascota_nombre: string;
+    nombre: string;
+    tipo: string;
+    fecha_aplicacion: string;
+    proxima_dosis: string | null;
+    lote: string | null;
+    observaciones: string | null;
+}
+
+function mapearVacuna(api: VacunaApi): Vacuna {
+    return {
+        id: api.id,
+        mascotaId: api.mascota_id,
+        mascotaNombre: api.mascota_nombre,
+        nombre: api.nombre,
+        tipo: api.tipo as TipoRegistroSanitario,
+        fechaAplicacion: api.fecha_aplicacion,
+        proximaDosis: api.proxima_dosis ?? '',
+        lote: api.lote ?? '',
+        observaciones: api.observaciones ?? '',
+    };
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class VacunasService {
-    private almacenamiento = inject(AlmacenamientoService);
-    private _vacunas = signal<Vacuna[]>(this.almacenamiento.leer(CLAVE, this.semilla()));
+    private http = inject(HttpClient);
+    private readonly API = `${environment.apiUrl}/vacunas`;
+
+    private _vacunas = signal<Vacuna[]>([]);
+    readonly cargando = signal(false);
+    readonly error = signal<string | null>(null);
 
     readonly vacunas = this._vacunas.asReadonly();
     readonly total = computed(() => this._vacunas().length);
@@ -31,6 +66,10 @@ export class VacunasService {
     );
 
     estado(vacuna: Vacuna): EstadoRegistroSanitario {
+        if (!vacuna.proximaDosis) {
+            return 'Vigente';
+        }
+
         const dias = diasHasta(vacuna.proximaDosis);
 
         if (dias < 0) {
@@ -44,88 +83,62 @@ export class VacunasService {
         return 'Vigente';
     }
 
-    crear(datos: VacunaFormulario, mascotaNombre: string): Vacuna {
-        const vacuna: Vacuna = {
-            ...datos,
-            id: this.siguienteId(),
-            mascotaNombre,
-        };
+    async cargar(): Promise<void> {
+        this.cargando.set(true);
+        this.error.set(null);
 
-        this._vacunas.update((vacunas) => [...vacunas, vacuna]);
-        this.persistir();
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<VacunaApi[]>(`${this.API}/`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._vacunas.set(datos.map(mapearVacuna));
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.cargando.set(false);
+        }
+    }
+
+    async cargarPorMascota(mascotaId: number): Promise<Vacuna[]> {
+        const datos = await firstValueFrom(
+            this.http
+                .get<VacunaApi[]>(`${this.API}/`, {
+                    params: { mascota_id: mascotaId },
+                })
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        return datos.map(mapearVacuna);
+    }
+
+    async crear(datos: VacunaFormulario, _mascotaNombre: string): Promise<Vacuna> {
+        const api = await firstValueFrom(
+            this.http
+                .post<VacunaApi>(`${this.API}/`, {
+                    mascota_id: datos.mascotaId,
+                    nombre: datos.nombre,
+                    tipo: datos.tipo,
+                    fecha_aplicacion: datos.fechaAplicacion,
+                    proxima_dosis: datos.proximaDosis || null,
+                    lote: datos.lote || null,
+                    observaciones: datos.observaciones || null,
+                })
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        const vacuna = mapearVacuna(api);
+        this._vacunas.update((vacunas) => [vacuna, ...vacunas]);
         return vacuna;
     }
 
-    eliminar(id: number): void {
-        this._vacunas.update((vacunas) => vacunas.filter((vacuna) => vacuna.id !== id));
-        this.persistir();
-    }
-
-    private siguienteId(): number {
-        return this._vacunas().reduce((maximo, vacuna) => Math.max(maximo, vacuna.id), 0) + 1;
-    }
-
-    private persistir(): void {
-        this.almacenamiento.guardar(CLAVE, this._vacunas());
-    }
-
-    private semilla(): Vacuna[] {
-        return [
-            {
-                id: 1,
-                mascotaId: 1,
-                mascotaNombre: 'Simba',
-                nombre: 'Vacuna Séxtuple Canina',
-                tipo: 'Vacuna',
-                fechaAplicacion: fechaRelativa(-30),
-                proximaDosis: fechaRelativa(335),
-                lote: '#VX-994',
-                observaciones: 'Aplicada sin reacciones adversas.',
-            },
-            {
-                id: 2,
-                mascotaId: 2,
-                mascotaNombre: 'Milo',
-                nombre: 'Desparasitación NexGard',
-                tipo: 'Desparasitación',
-                fechaAplicacion: fechaRelativa(-24),
-                proximaDosis: fechaRelativa(6),
-                lote: '#NG-2210',
-                observaciones: 'Control antiparasitario interno y externo.',
-            },
-            {
-                id: 3,
-                mascotaId: 1,
-                mascotaNombre: 'Simba',
-                nombre: 'Antirrábica Anual',
-                tipo: 'Vacuna',
-                fechaAplicacion: fechaRelativa(-90),
-                proximaDosis: fechaRelativa(275),
-                lote: '#AR-5521',
-                observaciones: 'Certificado oficial emitido por MINSA.',
-            },
-            {
-                id: 4,
-                mascotaId: 2,
-                mascotaNombre: 'Milo',
-                nombre: 'Triple Felina',
-                tipo: 'Vacuna',
-                fechaAplicacion: fechaRelativa(-400),
-                proximaDosis: fechaRelativa(-35),
-                lote: '#TF-1180',
-                observaciones: 'Requiere refuerzo inmediato.',
-            },
-            {
-                id: 5,
-                mascotaId: 2,
-                mascotaNombre: 'Milo',
-                nombre: 'Tratamiento dermatológico',
-                tipo: 'Tratamiento',
-                fechaAplicacion: fechaRelativa(-10),
-                proximaDosis: fechaRelativa(20),
-                lote: '#DM-7781',
-                observaciones: 'Aplicar shampoo medicado cada 3 días.',
-            },
-        ];
+    async eliminar(id: number): Promise<void> {
+        await firstValueFrom(
+            this.http
+                .delete(`${this.API}/${id}`)
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        this._vacunas.update((vacunas) =>
+            vacunas.filter((vacuna) => vacuna.id !== id),
+        );
     }
 }

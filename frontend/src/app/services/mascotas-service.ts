@@ -1,88 +1,118 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AlmacenamientoService } from './almacenamiento-service';
-import { Mascota, MascotaFormulario } from '../interfaces/Mascota';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-const CLAVE = 'portal_mascotas_v1';
+import { environment } from '../../environments/environment';
+import { manejarErrorHttp } from '../utils/error-http';
+import {
+    EspecieMascota,
+    Mascota,
+    MascotaFormulario,
+} from '../interfaces/Mascota';
+
+interface MascotaApi {
+    id: number;
+    usuario_id: number | null;
+    nombre: string;
+    especie: string;
+    raza: string | null;
+    edad: number | null;
+    sexo: string | null;
+    peso: number | null;
+    microchip: string | null;
+    diagnostico: string | null;
+    cobertura: string | null;
+    foto: string | null;
+    activo: boolean;
+}
+
+function mapearMascota(api: MascotaApi): Mascota {
+    return {
+        id: api.id,
+        nombre: api.nombre,
+        especie: api.especie as EspecieMascota,
+        raza: api.raza ?? '',
+        edad: api.edad ?? 0,
+        sexo: api.sexo ?? '',
+        peso: api.peso ?? 0,
+        microchip: api.microchip ?? '',
+        diagnostico: api.diagnostico ?? '',
+        cobertura: api.cobertura ?? '',
+        foto: api.foto ?? '',
+    };
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class MascotasService {
-    private almacenamiento = inject(AlmacenamientoService);
-    private _mascotas = signal<Mascota[]>(this.almacenamiento.leer(CLAVE, this.semilla()));
+    private http = inject(HttpClient);
+    private readonly API = `${environment.apiUrl}/mascotas`;
+
+    private _mascotas = signal<Mascota[]>([]);
+    readonly cargando = signal(false);
+    readonly error = signal<string | null>(null);
 
     readonly mascotas = this._mascotas.asReadonly();
     readonly total = computed(() => this._mascotas().length);
-    readonly nombres = computed(() => this._mascotas().map((mascota) => mascota.nombre).join(' y '));
+    readonly nombres = computed(() =>
+        this._mascotas().map((mascota) => mascota.nombre).join(' y '),
+    );
 
-    crear(datos: MascotaFormulario): Mascota {
-        const mascota: Mascota = {
-            ...datos,
-            id: this.siguienteId(),
-            foto: datos.foto ?? '',
-        };
+    async cargar(): Promise<void> {
+        this.cargando.set(true);
+        this.error.set(null);
 
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<MascotaApi[]>(`${this.API}/`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._mascotas.set(datos.map(mapearMascota));
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.cargando.set(false);
+        }
+    }
+
+    async crear(datos: MascotaFormulario): Promise<Mascota> {
+        const api = await firstValueFrom(
+            this.http
+                .post<MascotaApi>(`${this.API}/`, datos)
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        const mascota = mapearMascota(api);
         this._mascotas.update((mascotas) => [...mascotas, mascota]);
-        this.persistir();
         return mascota;
     }
 
-    actualizar(id: number, datos: MascotaFormulario): void {
-        this._mascotas.update((mascotas) =>
-            mascotas.map((mascota) =>
-                mascota.id === id
-                    ? { ...mascota, ...datos, foto: datos.foto ?? mascota.foto }
-                    : mascota,
-            ),
+    async actualizar(id: number, datos: MascotaFormulario): Promise<void> {
+        const api = await firstValueFrom(
+            this.http
+                .put<MascotaApi>(`${this.API}/${id}`, datos)
+                .pipe(catchError(manejarErrorHttp)),
         );
-        this.persistir();
+        const actualizada = mapearMascota(api);
+        this._mascotas.update((mascotas) =>
+            mascotas.map((mascota) => (mascota.id === id ? actualizada : mascota)),
+        );
     }
 
-    eliminar(id: number): void {
-        this._mascotas.update((mascotas) => mascotas.filter((mascota) => mascota.id !== id));
-        this.persistir();
+    async eliminar(id: number): Promise<void> {
+        await firstValueFrom(
+            this.http
+                .delete(`${this.API}/${id}`)
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        this._mascotas.update((mascotas) =>
+            mascotas.filter((mascota) => mascota.id !== id),
+        );
     }
 
     obtener(id: number): Mascota | undefined {
         return this._mascotas().find((mascota) => mascota.id === id);
-    }
-
-    private siguienteId(): number {
-        return this._mascotas().reduce((maximo, mascota) => Math.max(maximo, mascota.id), 0) + 1;
-    }
-
-    private persistir(): void {
-        this.almacenamiento.guardar(CLAVE, this._mascotas());
-    }
-
-    private semilla(): Mascota[] {
-        return [
-            {
-                id: 1,
-                nombre: 'Simba',
-                especie: 'CANINO',
-                raza: 'Golden Retriever',
-                edad: 5,
-                sexo: 'Macho castrado',
-                peso: 31.5,
-                microchip: '#7890-PER-2021',
-                diagnostico: 'Salud Óptima',
-                cobertura: 'Plan Preventivo Senior',
-                foto: 'https://images.unsplash.com/photo-1552053831-71594a27632d?q=80&w=200&auto=format&fit=crop',
-            },
-            {
-                id: 2,
-                nombre: 'Milo',
-                especie: 'FELINO',
-                raza: 'Gato Europeo Atigrado',
-                edad: 3,
-                sexo: 'Macho',
-                peso: 4.8,
-                microchip: '#4512-PER-2023',
-                diagnostico: 'Tratamiento dermatológico al día',
-                cobertura: 'Plan Esencial Felino',
-                foto: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?q=80&w=200&auto=format&fit=crop',
-            },
-        ];
     }
 }

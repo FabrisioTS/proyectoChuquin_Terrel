@@ -339,3 +339,108 @@ BEGIN
     CREATE INDEX IX_pagos_estado ON dbo.pagos(estado);
 END
 GO
+
+-- ==========================================================
+-- 8. MIGRACIONES PARA EL PORTAL (roles, baja lógica, FKs)
+-- ==========================================================
+
+IF COL_LENGTH('dbo.usuarios', 'rol') IS NULL
+BEGIN
+    ALTER TABLE dbo.usuarios
+        ADD rol NVARCHAR(20) NOT NULL
+            CONSTRAINT DF_usuarios_rol DEFAULT ('propietario');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_usuarios_rol')
+BEGIN
+    ALTER TABLE dbo.usuarios
+        ADD CONSTRAINT CK_usuarios_rol
+            CHECK (rol IN ('propietario', 'veterinario', 'admin'));
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_usuarios_rol' AND object_id = OBJECT_ID('dbo.usuarios'))
+BEGIN
+    CREATE INDEX IX_usuarios_rol ON dbo.usuarios(rol);
+END
+GO
+
+IF COL_LENGTH('dbo.mascotas', 'activo') IS NULL
+BEGIN
+    ALTER TABLE dbo.mascotas
+        ADD activo BIT NOT NULL CONSTRAINT DF_mascotas_activo DEFAULT (1);
+END
+GO
+
+IF COL_LENGTH('dbo.historial', 'veterinario_id') IS NULL
+BEGIN
+    ALTER TABLE dbo.historial ADD veterinario_id INT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_veterinario')
+BEGIN
+    ALTER TABLE dbo.historial
+        ADD CONSTRAINT FK_historial_veterinario
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
+END
+GO
+
+IF COL_LENGTH('dbo.citas', 'veterinario_id') IS NULL
+BEGIN
+    ALTER TABLE dbo.citas ADD veterinario_id INT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_veterinario')
+BEGIN
+    ALTER TABLE dbo.citas
+        ADD CONSTRAINT FK_citas_veterinario
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_mascota')
+BEGIN
+    ALTER TABLE dbo.historial
+        ADD CONSTRAINT FK_historial_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_mascota')
+BEGIN
+    ALTER TABLE dbo.citas
+        ADD CONSTRAINT FK_citas_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_vacunas_mascota')
+BEGIN
+    ALTER TABLE dbo.vacunas
+        ADD CONSTRAINT FK_vacunas_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+-- ==========================================================
+-- 9. CONFIGURACIÓN POR USUARIO
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.configuracion_usuario', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.configuracion_usuario (
+        usuario_id             INT NOT NULL,
+        sede                   NVARCHAR(100) NULL,
+        notificaciones_citas   BIT NOT NULL CONSTRAINT DF_conf_citas    DEFAULT (1),
+        notificaciones_vacunas BIT NOT NULL CONSTRAINT DF_conf_vacunas  DEFAULT (1),
+        notificaciones_pagos   BIT NOT NULL CONSTRAINT DF_conf_pagos    DEFAULT (0),
+        actualizado_en         DATETIME2(0) NOT NULL CONSTRAINT DF_conf_actualizado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_configuracion_usuario PRIMARY KEY (usuario_id),
+        CONSTRAINT FK_conf_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE CASCADE
+    );
+END
+GO

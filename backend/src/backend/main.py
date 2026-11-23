@@ -4,7 +4,15 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .apis.cita_api import cita_router
+from .apis.configuracion_api import configuracion_router
+from .apis.historial_api import historial_router
+from .apis.mascota_api import mascota_router
+from .apis.pago_api import pago_router
+from .apis.producto_api import producto_router
 from .apis.usuario_api import usuario_router
+from .apis.vacuna_api import vacuna_router
+from .apis.veterinario_api import veterinario_router
 from .core.config import DB_AUTO_INIT, PROJECT_NAME
 from .database.inicializacion import inicializar_base_datos
 
@@ -40,3 +48,11 @@ app.add_middleware(
 
 
 app.include_router(usuario_router, prefix="/api")
+app.include_router(mascota_router, prefix="/api")
+app.include_router(historial_router, prefix="/api")
+app.include_router(cita_router, prefix="/api")
+app.include_router(vacuna_router, prefix="/api")
+app.include_router(pago_router, prefix="/api")
+app.include_router(producto_router, prefix="/api")
+app.include_router(configuracion_router, prefix="/api")
+app.include_router(veterinario_router, prefix="/api")

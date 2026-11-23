@@ -11,6 +11,7 @@ from ..schemas.usuario_esquema import (
     RecuperarPasswordSolicitud,
     RestablecerPassword,
     TokenResponse,
+    UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
     UsuarioResponse,
@@ -88,3 +89,17 @@ def cambiar_password(
 def obtener_perfil(usuario_actual: Usuario = Depends(get_current_user)):
     """Ruta protegida de ejemplo: requiere enviar el header Authorization: Bearer <token>."""
     return usuario_actual
+
+
+@usuario_router.put(
+    "/me", response_model=UsuarioResponse, status_code=status.HTTP_200_OK
+)
+def actualizar_perfil(
+    datos: UsuarioActualizar,
+    usuario_actual: Usuario = Depends(get_current_user),
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    """Actualiza los datos personales del usuario autenticado."""
+    repositorio = UsuarioRepository(conexion)
+    servicio = UsuarioService(repositorio)
+    return servicio.actualizar_perfil(usuario_actual, datos)

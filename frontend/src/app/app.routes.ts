@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './guards/auth-guard';
+import { propietarioGuard } from './guards/propietario-guard';
+import { rolGuard } from './guards/rol-guard';
 
 export const routes: Routes = [
     {
@@ -19,7 +21,7 @@ export const routes: Routes = [
     },
     {
         path: 'dashboard',
-        canActivate: [authGuard],
+        canActivate: [authGuard, propietarioGuard],
         loadComponent: () =>
             import('./components/dashboard/dashboard-layout/dashboard-layout').then(
                 (modulo) => modulo.DashboardLayout,
@@ -79,6 +81,66 @@ export const routes: Routes = [
                 loadComponent: () =>
                     import('./components/dashboard/pages/configuracion/configuracion').then(
                         (modulo) => modulo.Configuracion,
+                    ),
+            },
+            { path: '**', redirectTo: '' },
+        ],
+    },
+    {
+        path: 'veterinario',
+        canActivate: [authGuard, rolGuard(['veterinario', 'admin'])],
+        loadComponent: () =>
+            import('./components/veterinario/veterinario-layout/veterinario-layout').then(
+                (modulo) => modulo.VeterinarioLayout,
+            ),
+        children: [
+            {
+                path: '',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/panel/panel').then(
+                        (modulo) => modulo.Panel,
+                    ),
+            },
+            {
+                path: 'pacientes',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/pacientes/pacientes').then(
+                        (modulo) => modulo.Pacientes,
+                    ),
+            },
+            {
+                path: 'pacientes/:id',
+                loadComponent: () =>
+                    import(
+                        './components/veterinario/pages/paciente-detalle/paciente-detalle'
+                    ).then((modulo) => modulo.PacienteDetalle),
+            },
+            {
+                path: 'historial',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/historial/historial').then(
+                        (modulo) => modulo.Historial,
+                    ),
+            },
+            {
+                path: 'agenda',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/agenda/agenda').then(
+                        (modulo) => modulo.Agenda,
+                    ),
+            },
+            {
+                path: 'vacunas',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/vacunas/vacunas').then(
+                        (modulo) => modulo.Vacunas,
+                    ),
+            },
+            {
+                path: 'pagos',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/pagos/pagos').then(
+                        (modulo) => modulo.Pagos,
                     ),
             },
             { path: '**', redirectTo: '' },
