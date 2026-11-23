@@ -13,7 +13,7 @@ PRODUCTOS_SEMILLA = (
         "Alimento super premium con salmón y omega 3 para cuidar la piel "
         "sensible y mantener un pelaje brillante.",
         "",
-        "images/cambo_alimento_seco.jpg",
+        "/images/cambo_alimento_seco.jpg",
     ),
     (
         "Canbo Cachorro Cordero",
@@ -23,7 +23,7 @@ PRODUCTOS_SEMILLA = (
         "Fórmula balanceada con cordero para cachorros de razas medianas y "
         "grandes en etapa de crecimiento.",
         "",
-        "images/cambo_cachorro_cordero.webp",
+        "/images/cambo_cachorro_cordero.webp",
     ),
     (
         "Canbo Adulto Cordero 2x1 (Pack 2 bolsas)",
@@ -33,7 +33,7 @@ PRODUCTOS_SEMILLA = (
         "Promoción 2x1: dos bolsas de alimento super premium con cordero para "
         "perros adultos de razas medianas y grandes.",
         "",
-        "images/cambo_comida_adultos_2x1.jpg",
+        "/images/cambo_comida_adultos_2x1.jpg",
     ),
     (
         "Canbo Gato Esterilizado Lata",
@@ -43,7 +43,7 @@ PRODUCTOS_SEMILLA = (
         "Alimento húmedo para gatos esterilizados con pollo, formulado para el "
         "control de peso y cuidado urinario.",
         "",
-        "images/cambo_gatos.jpg",
+        "/images/cambo_gatos.jpg",
     ),
     (
         "Canbo Cachorro Hipoalergénico Lata",
@@ -53,7 +53,7 @@ PRODUCTOS_SEMILLA = (
         "Lata hipoalergénica para cachorros con cordero y arroz, ideal para "
         "estómagos sensibles.",
         "",
-        "images/cambo_lata_cachorro.jpg",
+        "/images/cambo_lata_cachorro.jpg",
     ),
     (
         "Canbo Adulto Cordero",
@@ -63,7 +63,7 @@ PRODUCTOS_SEMILLA = (
         "Alimento super premium con cordero para perros adultos de razas "
         "medianas y grandes.",
         "",
-        "images/cambo__audlto_cordero.webp",
+        "/images/cambo__audlto_cordero.webp",
     ),
     (
         "Juguete Peluche Monstruo",
@@ -73,7 +73,7 @@ PRODUCTOS_SEMILLA = (
         "Peluche de felpa con textura suave y sonido interno para estimular "
         "el juego y reducir el estrés.",
         "",
-        "images/juguete.webp",
+        "/images/juguete.webp",
     ),
     (
         "Varita con Plumas para Gatos",
@@ -83,7 +83,7 @@ PRODUCTOS_SEMILLA = (
         "Juguete interactivo con plumas y cascabel para despertar el instinto "
         "cazador de los felinos.",
         "",
-        "images/juguete_gatos.webp",
+        "/images/juguete_gatos.webp",
     ),
     (
         "Cepillo Deslanador BioSilk",
@@ -93,7 +93,7 @@ PRODUCTOS_SEMILLA = (
         "Cepillo con cerdas de acero que elimina el pelo suelto, los nudos y "
         "el exceso de pelo muerto.",
         "",
-        "images/cepillo_perros.webp",
+        "/images/cepillo_perros.webp",
     ),
     (
         "Cepillo Multiuso IntelliFlex",
@@ -103,7 +103,7 @@ PRODUCTOS_SEMILLA = (
         "Cepillo de doble cara con cerdas de nylon y silicona para estimular "
         "los aceites naturales del pelaje.",
         "",
-        "images/cepillo_2.webp",
+        "/images/cepillo_2.webp",
     ),
     (
         "Kit Dental Tartar Control Vainilla",
@@ -113,7 +113,7 @@ PRODUCTOS_SEMILLA = (
         "Pasta dental sabor vainilla con cepillo y aplicador para el control "
         "del sarro y la placa bacteriana.",
         "",
-        "images/kid_dental_sabor_vainilla.webp",
+        "/images/kid_dental_sabor_vainilla.webp",
     ),
     (
         "Neutralizador de Olores para Gatos",
@@ -123,7 +123,7 @@ PRODUCTOS_SEMILLA = (
         "Cristales desodorantes con bicarbonato y aceites esenciales que "
         "neutralizan los olores del arenero.",
         "",
-        "images/neutralizador_olores_gatos.webp",
+        "/images/neutralizador_olores_gatos.webp",
     ),
     (
         "Paños Húmedos Polish",
@@ -133,7 +133,7 @@ PRODUCTOS_SEMILLA = (
         "Toallitas limpiadoras con aroma very berry para pelo y patas. "
         "Presentación de 100 unidades.",
         "",
-        "images/panos_limpiez.webp",
+        "/images/panos_limpiez.webp",
     ),
     (
         "Paños Húmedos Nourish",
@@ -143,7 +143,7 @@ PRODUCTOS_SEMILLA = (
         "Toallitas nutritivas con aroma sweet chamomile para el cuidado "
         "diario del pelaje. 100 unidades.",
         "",
-        "images/panos_limpieza2.webp",
+        "/images/panos_limpieza2.webp",
     ),
     (
         "Spray Control de Sarro",
@@ -153,7 +153,7 @@ PRODUCTOS_SEMILLA = (
         "Spray dental con bicarbonato que ayuda a reducir la placa y el sarro "
         "sin necesidad de cepillado.",
         "",
-        "images/spray_control_sarro.webp",
+        "/images/spray_control_sarro.webp",
     ),
     (
         "Bolso Portamascotas Aire Libre",
@@ -163,7 +163,7 @@ PRODUCTOS_SEMILLA = (
         "Bolso ergonómico con ventilación, correa ajustable y base acolchada "
         "para perros y gatos pequeños.",
         "",
-        "images/bolso_porta_mascotas.webp",
+        "/images/bolso_porta_mascotas.webp",
     ),
     (
         "Cama Nube Pequeña",
@@ -173,7 +173,7 @@ PRODUCTOS_SEMILLA = (
         "Cama acolchada color chocolate con bordes elevados y base "
         "antideslizante para descanso profundo.",
         "",
-        "images/cama_pequena.webp",
+        "/images/cama_pequena.webp",
     ),
     (
         "Cama Suspendida para Gatos",
@@ -183,7 +183,7 @@ PRODUCTOS_SEMILLA = (
         "Hamaca de ventosa para ventana con superficie de felpa y estructura "
         "resistente para gatos.",
         "",
-        "images/cama_suspendida_gatos.webp",
+        "/images/cama_suspendida_gatos.webp",
     ),
     (
         "Casaca Reversible Térmica",
@@ -193,7 +193,7 @@ PRODUCTOS_SEMILLA = (
         "Casaca acolchada reversible negro/rojo con cierre y orificio para el "
         "arnés. Ideal para días fríos.",
         "",
-        "images/casaca_reversible.webp",
+        "/images/casaca_reversible.webp",
     ),
     (
         "Collar Felino Tejido Fucsia",
@@ -203,7 +203,7 @@ PRODUCTOS_SEMILLA = (
         "Collar tejido ajustable con broche de seguridad y dije decorativo "
         "para gatos.",
         "",
-        "images/collar_gatos.webp",
+        "/images/collar_gatos.webp",
     ),
     (
         "Collar Deportivo Verde",
@@ -213,7 +213,7 @@ PRODUCTOS_SEMILLA = (
         "Collar de nylon resistente con broche de liberación rápida y argolla "
         "metálica para paseo diario.",
         "",
-        "images/collar_perro.webp",
+        "/images/collar_perro.webp",
     ),
     (
         "Collar Deportivo Camel",
@@ -223,7 +223,7 @@ PRODUCTOS_SEMILLA = (
         "Collar de nylon acolchado en tono camel con broche de seguridad y "
         "argolla para correa.",
         "",
-        "images/collar_perro2.webp",
+        "/images/collar_perro2.webp",
     ),
     (
         "Arnés Acolchado Terracota",
@@ -233,7 +233,7 @@ PRODUCTOS_SEMILLA = (
         "Arnés de malla acolchada con ajuste regulable y argolla dorsal para "
         "paseos cómodos y seguros.",
         "",
-        "images/pechera_terracota.webp",
+        "/images/pechera_terracota.webp",
     ),
     (
         "Arnés FlyHarness Negro",
@@ -243,7 +243,7 @@ PRODUCTOS_SEMILLA = (
         "Arnés ergonómico acolchado con bandas reflectivas, cierre de "
         "seguridad y argolla metálica.",
         "",
-        "images/Pechera2.webp",
+        "/images/Pechera2.webp",
     ),
     (
         "Arnés Escocés Multicolor",
@@ -253,7 +253,7 @@ PRODUCTOS_SEMILLA = (
         "Arnés de tela estampada escocés con broches regulables y argolla "
         "metálica para paseo.",
         "",
-        "images/pechera_escocesa.webp",
+        "/images/pechera_escocesa.webp",
     ),
     (
         "Placa QR Identificativa",
@@ -263,7 +263,7 @@ PRODUCTOS_SEMILLA = (
         "Placa metálica con código QR para identificación y contacto "
         "inmediato del tutor.",
         "",
-        "images/placa_identificacion_gatos.webp",
+        "/images/placa_identificacion_gatos.webp",
     ),
 )
 

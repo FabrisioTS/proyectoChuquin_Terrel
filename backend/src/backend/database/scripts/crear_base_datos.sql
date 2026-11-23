@@ -444,3 +444,36 @@ BEGIN
     );
 END
 GO
+
+-- ==========================================================
+-- 10. SOLICITUDES DE CITAS (Formulario público de contacto)
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.solicitudes_cita', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.solicitudes_cita (
+        id                 INT IDENTITY(1,1) NOT NULL,
+        tipo_mascota       NVARCHAR(20)      NOT NULL,
+        nombre_propietario NVARCHAR(100)     NOT NULL,
+        telefono           NVARCHAR(20)      NOT NULL,
+        nombre_mascota     NVARCHAR(100)     NOT NULL,
+        servicio           NVARCHAR(100)     NOT NULL,
+        fecha_deseada      DATE              NULL,
+        turno              NVARCHAR(50)      NULL,
+        notas              NVARCHAR(500)     NULL,
+        estado             NVARCHAR(20)      NOT NULL CONSTRAINT DF_solicitudes_estado DEFAULT ('Pendiente'),
+        creado_en          DATETIME2(0)      NOT NULL CONSTRAINT DF_solicitudes_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_solicitudes_cita PRIMARY KEY (id)
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_solicitudes_creado'
+      AND object_id = OBJECT_ID(N'dbo.solicitudes_cita')
+)
+BEGIN
+    CREATE INDEX IX_solicitudes_creado ON dbo.solicitudes_cita(creado_en DESC);
+END
+GO

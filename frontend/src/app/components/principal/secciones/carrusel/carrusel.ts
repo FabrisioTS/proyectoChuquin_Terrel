@@ -29,43 +29,43 @@ export class Carrusel {
 
   readonly fotos: FotoCarrusel[] = [
     {
-      src: 'images/perrop.jpeg',
+      src: '/images/perrop.jpeg',
       alt: 'Perro atendido en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente canino',
       titulo: 'Atención integral para perros',
     },
     {
-      src: 'images/pug.jpeg',
+      src: '/images/pug.jpeg',
       alt: 'Pug en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente canino',
       titulo: 'Cada mascota, un trato único',
     },
     {
-      src: 'images/snauser.png',
+      src: '/images/snauser.png',
       alt: 'Schnauzer en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente canino',
       titulo: 'Cuidado en cada etapa de su vida',
     },
     {
-      src: 'images/snauser2.jpeg',
+      src: '/images/snauser2.jpeg',
       alt: 'Schnauzer durante su consulta en la clínica',
       etiqueta: 'Paciente canino',
       titulo: 'Diagnósticos con equipos modernos',
     },
     {
-      src: 'images/gato.jpg',
+      src: '/images/gato.jpg',
       alt: 'Gato atendido en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente felino',
       titulo: 'Espacios pensados para gatos',
     },
     {
-      src: 'images/gatochino.jpeg',
+      src: '/images/gatochino.jpeg',
       alt: 'Gato curioso en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente felino',
       titulo: 'Menos estrés, más bienestar',
     },
     {
-      src: 'images/gatosiames.jpeg',
+      src: '/images/gatosiames.jpeg',
       alt: 'Gato siamés en la Clínica Veterinaria Pariona',
       etiqueta: 'Paciente felino',
       titulo: 'Acompañamiento en cada visita',

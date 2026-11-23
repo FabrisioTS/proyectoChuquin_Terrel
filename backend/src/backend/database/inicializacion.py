@@ -350,7 +350,7 @@ def _insertar_demo(conexion: pyodbc.Connection) -> bool:
                 cita[3],
                 cita[4],
                 "Sede Central - San Carlos",
-                "Av. San Carlos 123",
+                "Av. Francisco Solano 640, Huancayo",
             )
         finally:
             cursor.close()

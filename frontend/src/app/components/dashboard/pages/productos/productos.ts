@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import { ProductosService } from '../../../../services/productos-service';
 import { PagosService } from '../../../../services/pagos-service';
@@ -12,10 +12,16 @@ type FiltroCategoria = 'Todas' | CategoriaProducto;
     selector: 'app-productos',
     templateUrl: './productos.html',
 })
-export class Productos {
+export class Productos implements OnInit {
     private productosService = inject(ProductosService);
     private pagosService = inject(PagosService);
     private busquedaService = inject(BusquedaService);
+
+    ngOnInit(): void {
+        if (this.productosService.productos().length === 0) {
+            void this.productosService.cargar();
+        }
+    }
 
     readonly categorias = this.productosService.categorias;
     readonly categoria = signal<FiltroCategoria>('Todas');

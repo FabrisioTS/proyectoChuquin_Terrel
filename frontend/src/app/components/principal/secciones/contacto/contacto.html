@@ -56,7 +56,7 @@
                         </a>
 
                         <!-- Teléfonos -->
-                        <a href="tel:+51999888777"
+                        <a href="tel:+51914821538"
                             class="flex items-center gap-4 p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group">
                             <div
                                 class="w-10 h-10 rounded-xl bg-brand-600/20 text-accent-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
@@ -246,9 +246,14 @@
                     </div>
 
                     <!-- Botón de envío -->
-                    <button type="submit"
-                        class="w-full py-4 px-6 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.99] cursor-pointer">
-                        Confirmar Solicitud de Cita
+                    <button type="submit" [disabled]="cargando()"
+                        class="w-full py-4 px-6 bg-brand-600 hover:bg-brand-700 disabled:bg-slate-400 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.99] cursor-pointer disabled:cursor-not-allowed">
+                        @if (cargando()) {
+                            <span class="inline-block animate-spin mr-1">↻</span>
+                            <span>Enviando solicitud a la clínica...</span>
+                        } @else {
+                            <span>Confirmar Solicitud de Cita</span>
+                        }
                     </button>
 
                 </form>
