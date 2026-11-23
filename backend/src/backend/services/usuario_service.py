@@ -95,3 +95,114 @@ class UsuarioService:
             )
 
         return usuario
+<<<<<<< Updated upstream
+=======
+
+    def actualizar_perfil(
+        self, usuario: Usuario, datos: UsuarioActualizar
+    ) -> Usuario:
+        """Actualiza los datos personales del usuario autenticado."""
+        existente = self.usuario_repositorio.obtener_usuario_por_email(datos.email)
+
+        if existente and existente.id != usuario.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico ya está registrado por otra cuenta",
+            )
+
+        return self.usuario_repositorio.actualizar_usuario(
+            usuario.id,
+            datos.nombres,
+            datos.apellidos,
+            datos.email,
+            datos.telefono,
+        )
+
+    def solicitar_recuperacion(
+        self, datos: RecuperarPasswordSolicitud
+    ) -> RecuperarPasswordRespuesta:
+        """Verifica correo + DNI y entrega un token temporal de un solo uso."""
+        usuario = self.usuario_repositorio.obtener_usuario_por_email(datos.email)
+
+        # Mensaje genérico: no se revela si falló el correo o el DNI.
+        if (
+            not usuario
+            or not usuario.dni
+            or not secrets.compare_digest(usuario.dni, datos.dni)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Los datos no coinciden con una cuenta registrada",
+            )
+
+        token = crear_token_recuperacion(
+            usuario.id, usuario.email, usuario.password_hash
+        )
+
+        return RecuperarPasswordRespuesta(
+            mensaje="Identidad verificada. Define tu nueva contraseña.",
+            token_recuperacion=token,
+        )
+
+    def restablecer_password(self, datos: RestablecerPassword) -> dict[str, str]:
+        """Valida el token de recuperación y actualiza la contraseña."""
+        error_token = HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "El enlace de recuperación es inválido o ha expirado. "
+                "Solicita uno nuevo."
+            ),
+        )
+
+        try:
+            payload = decodificar_token_recuperacion(datos.token)
+            usuario_id = int(payload.get("sub", 0))
+        except (jwt.PyJWTError, TypeError, ValueError):
+            raise error_token from None
+
+        usuario = self.usuario_repositorio.obtener_usuario_por_id(usuario_id)
+
+        if not usuario:
+            raise error_token
+
+        # La huella cambia al modificar la contraseña: el token no se reutiliza.
+        huella_token = str(payload.get("huella", ""))
+        if not secrets.compare_digest(
+            huella_password(usuario.password_hash), huella_token
+        ):
+            raise error_token
+
+        if verificar_password(datos.password, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La nueva contraseña debe ser diferente a la anterior",
+            )
+
+        self.usuario_repositorio.actualizar_password_hash(
+            usuario.id, hash_password(datos.password)
+        )
+
+        return {"mensaje": "Contraseña actualizada correctamente."}
+
+    def cambiar_password(
+        self, usuario: Usuario, datos: CambiarPassword
+    ) -> dict[str, str]:
+        """Cambio de contraseña para un usuario ya autenticado."""
+        if not verificar_password(datos.password_actual, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La contraseña actual no es correcta",
+            )
+
+        if verificar_password(datos.password, usuario.password_hash):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La nueva contraseña debe ser diferente a la actual",
+            )
+
+        self.usuario_repositorio.actualizar_password_hash(
+            usuario.id, hash_password(datos.password)
+        )
+
+        return {"mensaje": "Contraseña actualizada correctamente."}
+>>>>>>> Stashed changes

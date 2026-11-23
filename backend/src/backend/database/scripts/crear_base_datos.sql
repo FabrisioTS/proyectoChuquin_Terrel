@@ -12,9 +12,9 @@
 -- Los usuarios de prueba se insertan desde Python (con Argon2),
 -- en backend/database/inicializacion.py.
 --
--- El frontend guarda su información en localStorage. Estas
--- tablas dejan preparada la base para cuando se conecte la API:
--- productos, mascotas, citas, vacunas, historial y pagos.
+-- El portal guarda toda su información (usuarios, mascotas, citas,
+-- vacunas, historial, pagos, productos, configuración y solicitudes)
+-- a través de FastAPI en esta base de datos.
 --
 -- Ejecutar desde el proyecto:
 --   uv run python -m backend.database.scripts.crear_base_datos
@@ -339,3 +339,149 @@ BEGIN
     CREATE INDEX IX_pagos_estado ON dbo.pagos(estado);
 END
 GO
+<<<<<<< Updated upstream
+=======
+
+-- ==========================================================
+-- 8. MIGRACIONES PARA EL PORTAL (roles, baja lógica, FKs)
+-- ==========================================================
+
+IF COL_LENGTH('dbo.usuarios', 'rol') IS NULL
+BEGIN
+    ALTER TABLE dbo.usuarios
+        ADD rol NVARCHAR(20) NOT NULL
+            CONSTRAINT DF_usuarios_rol DEFAULT ('propietario');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.check_constraints WHERE name = 'CK_usuarios_rol')
+BEGIN
+    ALTER TABLE dbo.usuarios
+        ADD CONSTRAINT CK_usuarios_rol
+            CHECK (rol IN ('propietario', 'veterinario', 'admin'));
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_usuarios_rol' AND object_id = OBJECT_ID('dbo.usuarios'))
+BEGIN
+    CREATE INDEX IX_usuarios_rol ON dbo.usuarios(rol);
+END
+GO
+
+IF COL_LENGTH('dbo.mascotas', 'activo') IS NULL
+BEGIN
+    ALTER TABLE dbo.mascotas
+        ADD activo BIT NOT NULL CONSTRAINT DF_mascotas_activo DEFAULT (1);
+END
+GO
+
+IF COL_LENGTH('dbo.historial', 'veterinario_id') IS NULL
+BEGIN
+    ALTER TABLE dbo.historial ADD veterinario_id INT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_veterinario')
+BEGIN
+    ALTER TABLE dbo.historial
+        ADD CONSTRAINT FK_historial_veterinario
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
+END
+GO
+
+IF COL_LENGTH('dbo.citas', 'veterinario_id') IS NULL
+BEGIN
+    ALTER TABLE dbo.citas ADD veterinario_id INT NULL;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_veterinario')
+BEGIN
+    ALTER TABLE dbo.citas
+        ADD CONSTRAINT FK_citas_veterinario
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_mascota')
+BEGIN
+    ALTER TABLE dbo.historial
+        ADD CONSTRAINT FK_historial_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_mascota')
+BEGIN
+    ALTER TABLE dbo.citas
+        ADD CONSTRAINT FK_citas_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_vacunas_mascota')
+BEGIN
+    ALTER TABLE dbo.vacunas
+        ADD CONSTRAINT FK_vacunas_mascota
+            FOREIGN KEY (mascota_id) REFERENCES dbo.mascotas(id);
+END
+GO
+
+-- ==========================================================
+-- 9. CONFIGURACIÓN POR USUARIO
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.configuracion_usuario', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.configuracion_usuario (
+        usuario_id             INT NOT NULL,
+        sede                   NVARCHAR(100) NULL,
+        notificaciones_citas   BIT NOT NULL CONSTRAINT DF_conf_citas    DEFAULT (1),
+        notificaciones_vacunas BIT NOT NULL CONSTRAINT DF_conf_vacunas  DEFAULT (1),
+        notificaciones_pagos   BIT NOT NULL CONSTRAINT DF_conf_pagos    DEFAULT (0),
+        actualizado_en         DATETIME2(0) NOT NULL CONSTRAINT DF_conf_actualizado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_configuracion_usuario PRIMARY KEY (usuario_id),
+        CONSTRAINT FK_conf_usuario FOREIGN KEY (usuario_id)
+            REFERENCES dbo.usuarios(id) ON DELETE CASCADE
+    );
+END
+GO
+
+-- ==========================================================
+-- 10. SOLICITUDES DEL PORTAL PÚBLICO
+-- ==========================================================
+
+IF OBJECT_ID(N'dbo.solicitudes', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.solicitudes (
+        id          INT IDENTITY(1,1) NOT NULL,
+        tipo        NVARCHAR(20)  NOT NULL,
+        nombre      NVARCHAR(120) NULL,
+        telefono    NVARCHAR(20)  NULL,
+        email       NVARCHAR(150) NULL,
+        mascota     NVARCHAR(120) NULL,
+        motivo      NVARCHAR(200) NULL,
+        mensaje     NVARCHAR(1000) NULL,
+        estado      NVARCHAR(20)  NOT NULL
+            CONSTRAINT DF_solicitudes_estado DEFAULT ('Nueva'),
+        creado_en   DATETIME2(0)  NOT NULL
+            CONSTRAINT DF_solicitudes_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_solicitudes PRIMARY KEY (id),
+        CONSTRAINT CK_solicitudes_tipo
+            CHECK (tipo IN ('cita', 'contacto', 'club')),
+        CONSTRAINT CK_solicitudes_estado
+            CHECK (estado IN ('Nueva', 'Atendida'))
+    );
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes
+    WHERE name = N'IX_solicitudes_estado'
+      AND object_id = OBJECT_ID(N'dbo.solicitudes')
+)
+BEGIN
+    CREATE INDEX IX_solicitudes_estado ON dbo.solicitudes(estado);
+END
+GO
+>>>>>>> Stashed changes
