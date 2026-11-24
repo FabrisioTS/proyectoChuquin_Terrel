@@ -34,6 +34,17 @@ export class LogIn {
   mostrarPassword = signal<boolean>(false);
   modalRecuperacion = signal<boolean>(false);
 
+  usarCredencialRapida(rol: 'admin' | 'veterinario' | 'cliente'): void {
+    if (rol === 'admin') {
+      this.usuarioModelo.set({ email: 'admin@veterinaria.com', password: 'Admin1234' });
+    } else if (rol === 'veterinario') {
+      this.usuarioModelo.set({ email: 'mariana.pariona@veterinaria.com', password: 'Vet12345' });
+    } else {
+      this.usuarioModelo.set({ email: 'ana.perez@correo.com', password: 'Clave1234' });
+    }
+    this.mensajeError.set(null);
+  }
+
   abrirRecuperacion(): void {
     this.mensajeError.set(null);
     this.modalRecuperacion.set(true);

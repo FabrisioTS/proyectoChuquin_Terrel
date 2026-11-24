@@ -383,7 +383,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_veterin
 BEGIN
     ALTER TABLE dbo.historial
         ADD CONSTRAINT FK_historial_veterinario
-            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
 END
 GO
 
@@ -397,7 +397,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_veterinario
 BEGIN
     ALTER TABLE dbo.citas
         ADD CONSTRAINT FK_citas_veterinario
-            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
 END
 GO
 
