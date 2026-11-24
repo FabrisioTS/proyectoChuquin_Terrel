@@ -85,6 +85,11 @@ export class VeterinarioLayout {
             exacto: true,
         },
         {
+            etiqueta: 'Personas registradas',
+            ruta: '/veterinario/clientes',
+            icono: 'people',
+        },
+        {
             etiqueta: 'Pacientes',
             ruta: '/veterinario/pacientes',
             icono: 'pets',
@@ -105,7 +110,7 @@ export class VeterinarioLayout {
             icono: 'vaccines',
         },
         {
-            etiqueta: 'Pagos',
+            etiqueta: 'Ventas y Cobros',
             ruta: '/veterinario/pagos',
             icono: 'receipt_long',
         },

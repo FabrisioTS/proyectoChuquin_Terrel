@@ -8,7 +8,13 @@ import { manejarErrorHttp } from '../utils/error-http';
 import { Cita, EstadoCita } from '../interfaces/Cita';
 import { Historial } from '../interfaces/Historial';
 import { EspecieMascota, Mascota } from '../interfaces/Mascota';
-import { Dueno, Paciente, ResumenVeterinario } from '../interfaces/Veterinario';
+import {
+    ClienteConMascotas,
+    CodigoTemporalInfo,
+    Dueno,
+    Paciente,
+    ResumenVeterinario,
+} from '../interfaces/Veterinario';
 
 interface MascotaApi {
     id: number;
@@ -33,6 +39,16 @@ interface DuenoApi {
     email: string;
     telefono: string;
     dni: string;
+}
+
+interface ClienteApi {
+    id: number;
+    nombres: string;
+    apellidos: string;
+    email: string;
+    telefono: string;
+    dni: string;
+    mascotas: MascotaApi[];
 }
 
 interface PacienteApi {
@@ -76,6 +92,8 @@ interface ResumenApi {
     citas_hoy: number;
     vacunas_proximas: number;
     pagos_pendientes: number;
+    clientes?: number;
+    total_ventas?: number;
 }
 
 function mapearMascota(api: MascotaApi): Mascota {
@@ -138,6 +156,7 @@ export class VeterinarioService {
 
     private _resumen = signal<ResumenVeterinario | null>(null);
     private _pacientes = signal<Paciente[]>([]);
+    private _clientes = signal<ClienteConMascotas[]>([]);
     private _agenda = signal<Cita[]>([]);
     private _historialReciente = signal<Historial[]>([]);
 
@@ -146,6 +165,7 @@ export class VeterinarioService {
 
     readonly resumen = this._resumen.asReadonly();
     readonly pacientes = this._pacientes.asReadonly();
+    readonly clientes = this._clientes.asReadonly();
     readonly agenda = this._agenda.asReadonly();
     readonly historialReciente = this._historialReciente.asReadonly();
 
@@ -158,6 +178,7 @@ export class VeterinarioService {
             await Promise.all([
                 this.cargarResumen(),
                 this.cargarPacientes(),
+                this.cargarClientes(),
                 this.cargarAgenda(),
                 this.cargarHistorialReciente(),
             ]);
@@ -180,6 +201,8 @@ export class VeterinarioService {
                 citasHoy: api.citas_hoy,
                 vacunasProximas: api.vacunas_proximas,
                 pagosPendientes: api.pagos_pendientes,
+                clientes: api.clientes ?? 0,
+                totalVentas: api.total_ventas ?? 0,
             });
         } catch (error) {
             this.error.set((error as Error).message);
@@ -235,6 +258,50 @@ export class VeterinarioService {
     obtenerPaciente(mascotaId: number): Paciente | undefined {
         return this._pacientes().find(
             (paciente) => paciente.mascota.id === mascotaId,
+        );
+    }
+
+    async cargarClientes(): Promise<void> {
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<ClienteApi[]>(`${this.API}/clientes`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._clientes.set(
+                datos.map((item) => ({
+                    id: item.id,
+                    nombres: item.nombres,
+                    apellidos: item.apellidos,
+                    email: item.email,
+                    telefono: item.telefono,
+                    dni: item.dni,
+                    mascotas: (item.mascotas || []).map(mapearMascota),
+                })),
+            );
+        } catch (error) {
+            this.error.set((error as Error).message);
+        }
+    }
+
+    async obtenerCodigoTemporal(): Promise<CodigoTemporalInfo> {
+        return firstValueFrom(
+            this.http
+                .get<CodigoTemporalInfo>(
+                    `${environment.apiUrl}/auth/admin/codigo-veterinario`,
+                )
+                .pipe(catchError(manejarErrorHttp)),
+        );
+    }
+
+    async regenerarCodigoTemporal(): Promise<CodigoTemporalInfo> {
+        return firstValueFrom(
+            this.http
+                .post<CodigoTemporalInfo>(
+                    `${environment.apiUrl}/auth/admin/codigo-veterinario/regenerar`,
+                    {},
+                )
+                .pipe(catchError(manejarErrorHttp)),
         );
     }
 }

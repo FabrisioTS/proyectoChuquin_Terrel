@@ -58,8 +58,28 @@ class UsuarioRepository:
             dni,
         )
 
+    def listar_por_rol(self, rol: str | None = None) -> list[Usuario]:
+        cursor = self.conexion.cursor()
+        try:
+            if rol:
+                cursor.execute(
+                    f"SELECT {COLUMNAS_USUARIO} FROM usuarios WHERE rol = ? ORDER BY apellidos, nombres",
+                    rol,
+                )
+            else:
+                cursor.execute(
+                    f"SELECT {COLUMNAS_USUARIO} FROM usuarios ORDER BY apellidos, nombres"
+                )
+            filas = cursor.fetchall()
+            return [_fila_a_usuario(fila) for fila in filas]
+        finally:
+            cursor.close()
+
     def crear_usuario(
-        self, usuario_datos: UsuarioRegistro, password_hashed: str
+        self,
+        usuario_datos: UsuarioRegistro,
+        password_hashed: str,
+        rol: str = "propietario",
     ) -> Usuario:
         consulta = f"""
             INSERT INTO usuarios (nombres, apellidos, email, telefono, dni, password_hash, rol)
@@ -78,7 +98,7 @@ class UsuarioRepository:
                 usuario_datos.telefono,
                 usuario_datos.dni,
                 password_hashed,
-                "propietario",
+                rol,
             )
             fila = cursor.fetchone()
         finally:

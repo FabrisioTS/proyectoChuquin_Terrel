@@ -12,6 +12,16 @@ class DuenoRespuesta(BaseModel):
     dni: str
 
 
+class ClienteRespuesta(BaseModel):
+    id: int
+    nombres: str
+    apellidos: str
+    email: str
+    telefono: str
+    dni: str
+    mascotas: list[MascotaRespuesta] = []
+
+
 class PacienteRespuesta(BaseModel):
     mascota: MascotaRespuesta
     dueno: DuenoRespuesta | None
@@ -22,3 +32,5 @@ class ResumenVeterinario(BaseModel):
     citas_hoy: int
     vacunas_proximas: int
     pagos_pendientes: int
+    clientes: int = 0
+    total_ventas: float = 0.0

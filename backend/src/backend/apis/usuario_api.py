@@ -1,12 +1,14 @@
 import pyodbc
 from fastapi import APIRouter, Depends, status
 
-from ..core.dependencies import get_current_user
+from ..core.codigo_temporal import gestor_codigo_veterinario
+from ..core.dependencies import get_current_admin, get_current_user
 from ..database.conection import get_db
 from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario_esquema import (
     CambiarPassword,
+    CodigoTemporalRespuesta,
     RecuperarPasswordRespuesta,
     RecuperarPasswordSolicitud,
     RestablecerPassword,
@@ -14,6 +16,7 @@ from ..schemas.usuario_esquema import (
     UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
+    UsuarioRegistroVeterinario,
     UsuarioResponse,
 )
 from ..services.usuario_service import UsuarioService
@@ -31,6 +34,45 @@ def registrar_usuario(
     repositorio = UsuarioRepository(conexion)
     servicio = UsuarioService(repositorio)
     return servicio.registrar_usuario(datos)
+
+
+@usuario_router.post(
+    "/register-veterinario",
+    response_model=UsuarioResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def registrar_veterinario(
+    datos: UsuarioRegistroVeterinario,
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    """Registro de personal veterinario protegido por código temporal dinámico."""
+    repositorio = UsuarioRepository(conexion)
+    servicio = UsuarioService(repositorio)
+    return servicio.registrar_veterinario(datos)
+
+
+@usuario_router.get(
+    "/admin/codigo-veterinario",
+    response_model=CodigoTemporalRespuesta,
+    status_code=status.HTTP_200_OK,
+)
+def obtener_codigo_veterinario(
+    _: Usuario = Depends(get_current_admin),
+):
+    """Devuelve el código temporal dinámico activo (exclusivo para Administrador)."""
+    return gestor_codigo_veterinario.obtener_codigo_actual()
+
+
+@usuario_router.post(
+    "/admin/codigo-veterinario/regenerar",
+    response_model=CodigoTemporalRespuesta,
+    status_code=status.HTTP_200_OK,
+)
+def regenerar_codigo_veterinario(
+    _: Usuario = Depends(get_current_admin),
+):
+    """Fuerza la rotación inmediata del código temporal (exclusivo para Administrador)."""
+    return gestor_codigo_veterinario.regenerar_codigo()
 
 
 @usuario_router.post(

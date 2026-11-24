@@ -102,6 +102,13 @@ export const routes: Routes = [
                     ),
             },
             {
+                path: 'clientes',
+                loadComponent: () =>
+                    import('./components/veterinario/pages/clientes/clientes').then(
+                        (modulo) => modulo.Clientes,
+                    ),
+            },
+            {
                 path: 'pacientes',
                 loadComponent: () =>
                     import('./components/veterinario/pages/pacientes/pacientes').then(

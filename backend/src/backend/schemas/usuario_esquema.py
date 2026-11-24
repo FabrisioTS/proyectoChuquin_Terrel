@@ -278,3 +278,23 @@ class CambiarPassword(BaseModel):
         if self.password != self.confirmar_password:
             raise ValueError("Las contraseñas no coinciden")
         return self
+
+
+# 8. Registro de veterinario protegido con código temporal
+class UsuarioRegistroVeterinario(UsuarioRegistro):
+    codigo_autorizacion: str = Field(min_length=4, max_length=20)
+
+    @field_validator("codigo_autorizacion", mode="before")
+    @classmethod
+    def validar_codigo_autorizacion(cls, valor):
+        valor = _limpiar_texto(valor)
+        if not valor:
+            raise ValueError("El código de autorización temporal es obligatorio")
+        return valor
+
+
+class CodigoTemporalRespuesta(BaseModel):
+    codigo: str
+    expira_en_segundos: int
+    valido_hasta: str
+

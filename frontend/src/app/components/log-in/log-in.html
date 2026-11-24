@@ -112,12 +112,38 @@
             <!-- Main Login Section -->
             <div class="w-full max-w-md mx-auto my-auto py-6">
 
-                <div class="mb-6">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Bienvenido de nuevo
-                    </h2>
-                    <p class="text-slate-500 text-xs sm:text-sm mt-1.5">
-                        Ingresa a tu cuenta para gestionar citas y la salud preventiva de tus mascotas.
+                <div class="mb-5">
+                    <div class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-600 mb-2">
+                        <span>Ingreso unificado a la clínica</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Iniciar Sesión</h2>
+                    <p class="text-slate-500 text-xs sm:text-sm mt-1">
+                        El sistema detecta automáticamente tu cuenta y te redirige a tu portal (<strong>Mi Mascota</strong> o <strong>Veterinario</strong>).
                     </p>
+                </div>
+
+                <!-- Selector rápido de credenciales de prueba -->
+                <div class="mb-5 rounded-2xl border border-slate-200/90 bg-slate-50/90 p-3">
+                    <span class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+                        Probar con cuentas predeterminadas (un clic):
+                    </span>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" (click)="usarCredencialRapida('admin')"
+                            class="flex flex-col items-center justify-center rounded-xl border border-amber-200 bg-white p-2 text-center shadow-2xs hover:bg-amber-50 hover:border-amber-400 transition-all cursor-pointer">
+                            <span class="text-xs font-black text-amber-900">🛡️ Admin</span>
+                            <span class="text-[9px] text-slate-500">Portal Médico</span>
+                        </button>
+                        <button type="button" (click)="usarCredencialRapida('veterinario')"
+                            class="flex flex-col items-center justify-center rounded-xl border border-teal-200 bg-white p-2 text-center shadow-2xs hover:bg-teal-50 hover:border-teal-400 transition-all cursor-pointer">
+                            <span class="text-xs font-black text-teal-800">🩺 Veterinaria</span>
+                            <span class="text-[9px] text-slate-500">Portal Médico</span>
+                        </button>
+                        <button type="button" (click)="usarCredencialRapida('cliente')"
+                            class="flex flex-col items-center justify-center rounded-xl border border-orange-200 bg-white p-2 text-center shadow-2xs hover:bg-orange-50 hover:border-orange-400 transition-all cursor-pointer">
+                            <span class="text-xs font-black text-[#c2410c]">🐾 Tutor</span>
+                            <span class="text-[9px] text-slate-500">Portal Mascota</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Tarjetas informativas de confianza -->

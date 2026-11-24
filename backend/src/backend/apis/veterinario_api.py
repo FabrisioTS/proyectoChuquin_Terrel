@@ -15,6 +15,7 @@ from ..repositories.vacuna_repository import VacunaRepository
 from ..schemas.cita_esquema import CitaRespuesta
 from ..schemas.historial_esquema import HistorialRespuesta
 from ..schemas.veterinario_esquema import (
+    ClienteRespuesta,
     PacienteRespuesta,
     ResumenVeterinario,
 )
@@ -56,6 +57,18 @@ def listar_pacientes(
     conexion: pyodbc.Connection = Depends(get_db),
 ):
     return _servicio(conexion).listar_pacientes()
+
+
+@veterinario_router.get(
+    "/clientes",
+    response_model=list[ClienteRespuesta],
+    status_code=status.HTTP_200_OK,
+)
+def listar_clientes(
+    _: Usuario = Depends(get_current_veterinario),
+    conexion: pyodbc.Connection = Depends(get_db),
+):
+    return _servicio(conexion).listar_clientes()
 
 
 @veterinario_router.get(

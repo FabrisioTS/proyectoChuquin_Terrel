@@ -97,6 +97,10 @@ export class Register {
   mensajeError = signal<string | null>(null);
   erroresServidor = signal<ErrorCampo[]>([]);
 
+  tipoRegistro = signal<'propietario' | 'veterinario'>('propietario');
+  codigoAutorizacion = signal<string>('');
+  errorCodigo = signal<string | null>(null);
+
   terminosAceptados = signal<boolean>(false);
   mostrarTerminos = signal<boolean>(false);
   aceptoEnModal = signal<boolean>(false);
@@ -154,6 +158,16 @@ export class Register {
       return;
     }
 
+    if (this.tipoRegistro() === 'veterinario') {
+      const codigo = this.codigoAutorizacion().trim().toUpperCase();
+      if (!codigo) {
+        this.errorCodigo.set('El código de autorización temporal es obligatorio para personal médico.');
+        this.mensajeError.set('Ingresa el código temporal de registro.');
+        return;
+      }
+      this.errorCodigo.set(null);
+    }
+
     const payload = this.usuarioModelo();
 
     if (payload.password !== payload.confirmar_password) {
@@ -166,17 +180,27 @@ export class Register {
     this.errorTerminos.set(false);
     this.cargando.set(true);
 
-    this.autenticacionService.registrar_usuario(payload).subscribe({
+    const peticion = this.tipoRegistro() === 'veterinario'
+      ? this.autenticacionService.registrar_veterinario({
+          ...payload,
+          codigo_autorizacion: this.codigoAutorizacion().trim().toUpperCase(),
+        })
+      : this.autenticacionService.registrar_usuario(payload);
+
+    peticion.subscribe({
       next: async () => {
         this.cargando.set(false);
 
         try {
           const { default: Swal } = await import('sweetalert2');
+          const esVet = this.tipoRegistro() === 'veterinario';
           await Swal.fire({
             icon: 'success',
-            title: 'Usuario registrado exitosamente',
-            text: 'Tu cuenta de propietario ha sido creada. Ya puedes iniciar sesión.',
-            confirmButtonText: 'Aceptar',
+            title: esVet ? 'Médico veterinario registrado' : 'Usuario registrado exitosamente',
+            text: esVet
+              ? 'Tu cuenta de personal médico ha sido creada. Ya puedes iniciar sesión con acceso al portal veterinario.'
+              : 'Tu cuenta de propietario ha sido creada. Ya puedes iniciar sesión.',
+            confirmButtonText: 'Iniciar sesión',
             confirmButtonColor: '#c2410c',
             allowOutsideClick: false,
             allowEscapeKey: false,

@@ -3,12 +3,19 @@
     <!-- Encabezado -->
     <header class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-700">Portal veterinario</span>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal-700">Portal veterinario</span>
+                @if (esAdmin()) {
+                <span class="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-black text-amber-900 border border-amber-300">
+                    MODO ADMINISTRADOR
+                </span>
+                }
+            </div>
             <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">{{ saludo() }}, {{ nombre() }}</h1>
-            <p class="mt-1 text-xs text-slate-500">Resumen de la actividad clínica del día.</p>
+            <p class="mt-1 text-xs text-slate-500">Resumen y control de la actividad clínica y administrativa de la clínica.</p>
         </div>
         <button (click)="actualizar()"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-teal-700/20 transition-all hover:-translate-y-0.5 hover:bg-teal-800">
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-700 px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-teal-700/20 transition-all hover:-translate-y-0.5 hover:bg-teal-800 cursor-pointer">
             <span class="icono-material text-base leading-none" aria-hidden="true">refresh</span>
             Actualizar panel
         </button>
@@ -20,54 +27,161 @@
     </div>
     }
 
-    <!-- Indicadores -->
-    <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
-            <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pacientes</span>
-                <span class="icono-material text-lg text-teal-700" aria-hidden="true">pets</span>
+    <!-- WIDGET EXCLUSIVO DE ADMINISTRADOR: CÓDIGO TEMPORAL DE REGISTRO -->
+    @if (esAdmin()) {
+    <section class="rounded-3xl border-2 border-amber-300/80 bg-linear-to-r from-amber-50/90 via-white to-amber-50/50 p-5 sm:p-6 shadow-xs">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+
+            <div class="space-y-1.5 max-w-xl">
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-900">
+                        <span class="icono-material text-xs" aria-hidden="true">security</span>
+                        Seguridad de Registro
+                    </span>
+                    <span class="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+                        Exclusivo Administrador
+                    </span>
+                </div>
+                <h2 class="text-base sm:text-lg font-black text-slate-900">
+                    Código Temporal para Crear Cuentas de Veterinario
+                </h2>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Comparte este código con los nuevos profesionales de la clínica para que puedan registrarse con perfil médico. Rota automáticamente cada 15 minutos en el servidor.
+                </p>
             </div>
-            <p class="mt-2 text-3xl font-black text-slate-900">{{ resumen()?.pacientes ?? 0 }}</p>
-            <p class="text-[11px] text-slate-400">Mascotas activas registradas</p>
+
+            <!-- Visor del Código + Acciones -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div class="flex items-center justify-between gap-4 rounded-2xl border-2 border-amber-300 bg-white px-4 py-3 shadow-inner">
+                    <div>
+                        <span class="block text-[9px] font-extrabold uppercase tracking-widest text-amber-800">CÓDIGO ACTIVO</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xl sm:text-2xl font-black tracking-wider text-slate-900">
+                                {{ codigoTemporal()?.codigo || 'CARGANDO...' }}
+                            </span>
+                            @if (codigoCopiado()) {
+                            <span class="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+                                ¡Copiado!
+                            </span>
+                            }
+                        </div>
+                    </div>
+                    <button type="button" (click)="copiarCodigo()" [disabled]="!codigoTemporal()?.codigo"
+                        class="rounded-xl bg-amber-100 p-2 text-amber-900 hover:bg-amber-200 transition-colors cursor-pointer"
+                        title="Copiar código al portapapeles">
+                        <span class="icono-material text-lg" aria-hidden="true">content_copy</span>
+                    </button>
+                </div>
+
+                <div class="flex flex-col justify-between gap-1.5">
+                    <div class="flex items-center gap-1.5 text-xs font-bold text-amber-900 bg-amber-100/70 rounded-xl px-3 py-1.5 border border-amber-200">
+                        <span class="icono-material text-sm text-amber-700" aria-hidden="true">timer</span>
+                        <span>Expira en: <strong class="font-mono">{{ tiempoRestanteFormateado() }}</strong></span>
+                    </div>
+
+                    <button type="button" (click)="regenerarCodigo()" [disabled]="cargandoCodigo()"
+                        class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-50 transition-colors shadow-2xs cursor-pointer disabled:opacity-50">
+                        <span class="icono-material text-sm" [class.animate-spin]="cargandoCodigo()" aria-hidden="true">sync</span>
+                        <span>Forzar nuevo código</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+    }
+
+    <!-- Barra de Accesos Rápidos -->
+    <section class="flex flex-wrap items-center gap-2.5">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider pr-1">Accesos directos:</span>
+        <a routerLink="/veterinario/clientes"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:border-teal-300 hover:text-teal-700 transition-colors">
+            <span class="icono-material text-sm text-teal-600" aria-hidden="true">people</span>
+            <span>Ver Clientes</span>
+        </a>
+        <a routerLink="/veterinario/pacientes"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:border-teal-300 hover:text-teal-700 transition-colors">
+            <span class="icono-material text-sm text-teal-600" aria-hidden="true">pets</span>
+            <span>Ver Pacientes</span>
+        </a>
+        <a routerLink="/veterinario/agenda"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:border-teal-300 hover:text-teal-700 transition-colors">
+            <span class="icono-material text-sm text-teal-600" aria-hidden="true">calendar_month</span>
+            <span>Agenda Médica</span>
+        </a>
+        <a routerLink="/veterinario/pagos"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-2xs hover:border-teal-300 hover:text-teal-700 transition-colors">
+            <span class="icono-material text-sm text-teal-600" aria-hidden="true">receipt_long</span>
+            <span>Ventas y Cobros</span>
+        </a>
+    </section>
+
+    <!-- Indicadores Principales (KPIs) -->
+    <section class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Clientes</span>
+                <span class="icono-material text-base text-teal-700" aria-hidden="true">people</span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-slate-900">{{ resumen()?.clientes ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Tutores registrados</p>
         </article>
-        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Citas de hoy</span>
-                <span class="icono-material text-lg text-teal-700" aria-hidden="true">calendar_month</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Pacientes</span>
+                <span class="icono-material text-base text-teal-700" aria-hidden="true">pets</span>
             </div>
-            <p class="mt-2 text-3xl font-black text-teal-700">{{ resumen()?.citasHoy ?? 0 }}</p>
-            <p class="text-[11px] text-slate-400">Turnos programados para hoy</p>
+            <p class="mt-2 text-2xl font-black text-slate-900">{{ resumen()?.pacientes ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Mascotas activas</p>
         </article>
-        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vacunas próximas</span>
-                <span class="icono-material text-lg text-amber-600" aria-hidden="true">vaccines</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Citas Hoy</span>
+                <span class="icono-material text-base text-teal-700" aria-hidden="true">calendar_month</span>
             </div>
-            <p class="mt-2 text-3xl font-black text-amber-600">{{ resumen()?.vacunasProximas ?? 0 }}</p>
-            <p class="text-[11px] text-slate-400">Refuerzos en los próximos 30 días</p>
+            <p class="mt-2 text-2xl font-black text-teal-700">{{ resumen()?.citasHoy ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Turnos programados</p>
         </article>
-        <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
             <div class="flex items-center justify-between">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Pagos pendientes</span>
-                <span class="icono-material text-lg text-rose-600" aria-hidden="true">receipt_long</span>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Vacunas</span>
+                <span class="icono-material text-base text-amber-600" aria-hidden="true">vaccines</span>
             </div>
-            <p class="mt-2 text-3xl font-black text-rose-600">{{ resumen()?.pagosPendientes ?? 0 }}</p>
-            <p class="text-[11px] text-slate-400">Comprobantes por regularizar</p>
+            <p class="mt-2 text-2xl font-black text-amber-600">{{ resumen()?.vacunasProximas ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Próximos 30 días</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Pendientes</span>
+                <span class="icono-material text-base text-rose-600" aria-hidden="true">receipt_long</span>
+            </div>
+            <p class="mt-2 text-2xl font-black text-rose-600">{{ resumen()?.pagosPendientes ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Cobros por cobrar</p>
+        </article>
+        <article class="rounded-3xl border border-slate-200/70 bg-white p-4 shadow-xs">
+            <div class="flex items-center justify-between">
+                <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400">Ventas</span>
+                <span class="icono-material text-base text-emerald-600" aria-hidden="true">payments</span>
+            </div>
+            <p class="mt-2 text-xl font-black text-emerald-700">S/ {{ resumen()?.totalVentas ?? 0 }}</p>
+            <p class="text-[10px] text-slate-400">Total recaudado</p>
         </article>
     </section>
 
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
 
         <!-- Agenda del día -->
-        <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-xs">
             <div class="mb-4 flex items-center justify-between">
                 <div>
                     <h2 class="text-sm font-extrabold text-slate-900">Agenda de hoy</h2>
                     <p class="text-xs text-slate-500">Citas programadas para la fecha actual.</p>
                 </div>
                 <a routerLink="/veterinario/agenda"
-                    class="rounded-xl bg-teal-50 px-3 py-2 text-[11px] font-bold text-teal-700 hover:bg-teal-100">Ver
-                    agenda</a>
+                    class="rounded-xl bg-teal-50 px-3 py-2 text-[11px] font-bold text-teal-700 hover:bg-teal-100 transition-colors">
+                    Ver agenda
+                </a>
             </div>
 
             <div class="space-y-3">
@@ -87,47 +201,50 @@
                 } @empty {
                 <div class="rounded-2xl border-2 border-dashed border-slate-200 p-8 text-center">
                     <p class="text-xs font-bold text-slate-600">No hay citas programadas para hoy</p>
-                    <p class="mt-1 text-[11px] text-slate-400">Puedes revisar la agenda completa.</p>
+                    <p class="mt-1 text-[11px] text-slate-400">Puedes revisar la agenda completa o agendar una cita.</p>
                 </div>
                 }
             </div>
         </section>
 
         <!-- Historial reciente -->
-        <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
+        <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-xs">
             <div class="mb-4 flex items-center justify-between">
                 <div>
                     <h2 class="text-sm font-extrabold text-slate-900">Últimos registros clínicos</h2>
-                    <p class="text-xs text-slate-500">Consultas registradas recientemente.</p>
+                    <p class="text-xs text-slate-500">Atenciones médicas y consultas recientes.</p>
                 </div>
                 <a routerLink="/veterinario/historial"
-                    class="rounded-xl bg-teal-50 px-3 py-2 text-[11px] font-bold text-teal-700 hover:bg-teal-100">Ver
-                    historial</a>
+                    class="rounded-xl bg-teal-50 px-3 py-2 text-[11px] font-bold text-teal-700 hover:bg-teal-100 transition-colors">
+                    Ver historial
+                </a>
             </div>
 
             <div class="space-y-3">
-                @for (registro of historialReciente(); track registro.id) {
+                @for (item of historialReciente(); track item.id) {
                 <article class="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
                     <div class="flex items-start justify-between gap-3">
                         <div>
-                            <h3 class="text-xs font-extrabold text-slate-900">{{ registro.motivo || 'Consulta' }}</h3>
-                            <p class="text-[11px] text-slate-500">{{ registro.mascotaNombre }} • {{ registro.doctor }}
-                            </p>
+                            <h3 class="text-xs font-extrabold text-slate-900">{{ item.diagnostico || item.motivo }}</h3>
+                            <p class="text-[11px] text-slate-500">{{ item.mascotaNombre }} • Dr(a). {{ item.doctor }}</p>
                         </div>
                         <span class="shrink-0 rounded-lg bg-white px-2 py-1 text-[10px] font-bold text-slate-600">
-                            {{ formatearFecha(registro.fecha) }}
+                            {{ formatearFecha(item.fecha) }}
                         </span>
                     </div>
-                    <p class="mt-1 line-clamp-2 text-[10px] leading-relaxed text-slate-500">{{ registro.diagnostico }}
-                    </p>
+                    @if (item.tratamiento) {
+                    <p class="mt-1 text-[11px] text-slate-600 line-clamp-1">Tratamiento: {{ item.tratamiento }}</p>
+                    }
                 </article>
                 } @empty {
                 <div class="rounded-2xl border-2 border-dashed border-slate-200 p-8 text-center">
-                    <p class="text-xs font-bold text-slate-600">Aún no hay registros clínicos</p>
-                    <p class="mt-1 text-[11px] text-slate-400">Crea el primero desde Historial clínico.</p>
+                    <p class="text-xs font-bold text-slate-600">No hay registros clínicos recientes</p>
+                    <p class="mt-1 text-[11px] text-slate-400">Las atenciones registradas aparecerán aquí.</p>
                 </div>
                 }
             </div>
         </section>
+
     </div>
+
 </div>

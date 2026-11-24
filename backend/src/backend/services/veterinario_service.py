@@ -7,6 +7,7 @@ from ..repositories.pago_repository import PagoRepository
 from ..repositories.usuario_repository import UsuarioRepository
 from ..repositories.vacuna_repository import VacunaRepository
 from ..schemas.veterinario_esquema import (
+    ClienteRespuesta,
     DuenoRespuesta,
     PacienteRespuesta,
     ResumenVeterinario,
@@ -55,6 +56,30 @@ class VeterinarioService:
 
         return pacientes
 
+    def listar_clientes(self) -> list[ClienteRespuesta]:
+        usuarios = self.usuario_repositorio.listar_por_rol("propietario")
+        todas_mascotas = self.mascota_repositorio.listar(None)
+
+        mascotas_por_usuario: dict[int, list] = {}
+        for m in todas_mascotas:
+            if m.usuario_id is not None:
+                mascotas_por_usuario.setdefault(m.usuario_id, []).append(m)
+
+        clientes: list[ClienteRespuesta] = []
+        for u in usuarios:
+            clientes.append(
+                ClienteRespuesta(
+                    id=u.id,
+                    nombres=u.nombres,
+                    apellidos=u.apellidos,
+                    email=u.email,
+                    telefono=u.telefono,
+                    dni=u.dni,
+                    mascotas=mascotas_por_usuario.get(u.id, []),
+                )
+            )
+        return clientes
+
     def agenda(self, fecha: date | None = None):
         dia = fecha or date.today()
         return self.cita_repositorio.listar(None, dia, dia)
@@ -79,10 +104,14 @@ class VeterinarioService:
         ]
 
         pagos_pendientes = [pago for pago in pagos if pago.estado != "Pagado"]
+        total_ventas = sum(float(pago.monto) for pago in pagos if pago.estado == "Pagado")
+        clientes = self.usuario_repositorio.listar_por_rol("propietario")
 
         return ResumenVeterinario(
             pacientes=len(mascotas),
             citas_hoy=len(citas_hoy),
             vacunas_proximas=len(vacunas_proximas),
             pagos_pendientes=len(pagos_pendientes),
+            clientes=len(clientes),
+            total_ventas=round(total_ventas, 2),
         )
