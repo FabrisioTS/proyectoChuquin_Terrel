@@ -6,7 +6,7 @@ from ..models.pago_model import Pago
 from ..models.usuario_model import Usuario
 from ..repositories.pago_repository import PagoRepository
 from ..repositories.producto_repository import ProductoRepository
-from ..schemas.pago_esquema import CheckoutSolicitud
+from ..schemas.pago_esquema import CheckoutSolicitud, PagoCrearDirecto
 from .alcance import usuario_filtro
 
 
@@ -84,3 +84,17 @@ class PagoService:
             )
 
         return pago
+
+    def registrar_directo(self, usuario: Usuario, datos: PagoCrearDirecto) -> Pago:
+        target_usuario_id = datos.usuario_id or usuario.id
+        codigo = self.pago_repositorio.siguiente_codigo()
+        return self.pago_repositorio.crear(
+            usuario_id=target_usuario_id,
+            codigo=codigo,
+            concepto=datos.concepto.strip()[:200],
+            fecha=date.today(),
+            monto=round(datos.monto, 2),
+            metodo=datos.metodo,
+            estado=datos.estado,
+            mascota_nombre=datos.mascota_nombre,
+        )

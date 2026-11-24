@@ -16,6 +16,15 @@ class CheckoutSolicitud(BaseModel):
     metodo: str = Field(default="Tarjeta", max_length=50)
 
 
+class PagoCrearDirecto(BaseModel):
+    concepto: str = Field(min_length=2, max_length=200)
+    monto: float = Field(gt=0)
+    metodo: str = Field(default="Efectivo", max_length=50)
+    mascota_nombre: str | None = Field(default=None, max_length=100)
+    estado: EstadoPago = "Pagado"
+    usuario_id: int | None = None
+
+
 class PagoRespuesta(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

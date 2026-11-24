@@ -10,6 +10,10 @@ export interface UsuarioRegistro {
     confirmar_password: string;
 }
 
+export interface UsuarioRegistroVeterinario extends UsuarioRegistro {
+    codigo_autorizacion: string;
+}
+
 
 export interface UsuarioLogin {
     email: string;

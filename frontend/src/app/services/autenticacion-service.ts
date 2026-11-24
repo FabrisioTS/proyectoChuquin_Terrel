@@ -14,6 +14,7 @@ import {
     UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
+    UsuarioRegistroVeterinario,
     UsuarioResponse,
 } from '../interfaces/Usuario';
 import { environment } from '../../environments/environment';
@@ -47,6 +48,14 @@ export class AutenticacionService {
     registrar_usuario(datos: UsuarioRegistro): Observable<UsuarioResponse> {
         return this.http
             .post<UsuarioResponse>(`${this.API_URL}/register`, datos)
+            .pipe(catchError(manejarErrorHttp));
+    }
+
+    registrar_veterinario(
+        datos: UsuarioRegistroVeterinario,
+    ): Observable<UsuarioResponse> {
+        return this.http
+            .post<UsuarioResponse>(`${this.API_URL}/register-veterinario`, datos)
             .pipe(catchError(manejarErrorHttp));
     }
 

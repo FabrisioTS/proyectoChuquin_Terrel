@@ -4,6 +4,7 @@ import jwt
 import pyodbc
 from fastapi import HTTPException, status
 
+from ..core.codigo_temporal import gestor_codigo_veterinario
 from ..core.segurity import (
     crear_token_acceso,
     crear_token_recuperacion,
@@ -24,6 +25,7 @@ from ..schemas.usuario_esquema import (
     UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
+    UsuarioRegistroVeterinario,
     UsuarioResponse,
 )
 
@@ -54,6 +56,45 @@ class UsuarioService:
         except pyodbc.IntegrityError:
             # Cubre la condición de carrera entre la validación y el INSERT
             # (índices únicos de email y dni).
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico o el DNI ya están registrados",
+            ) from None
+
+    def registrar_veterinario(
+        self, datos_veterinario: UsuarioRegistroVeterinario
+    ) -> Usuario:
+        if not gestor_codigo_veterinario.validar_codigo(
+            datos_veterinario.codigo_autorizacion
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El código de autorización temporal es inválido o ha expirado",
+            )
+
+        if self.usuario_repositorio.obtener_usuario_por_email(
+            datos_veterinario.email
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico ya está registrado",
+            )
+
+        if self.usuario_repositorio.obtener_usuario_por_dni(
+            datos_veterinario.dni
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El DNI ya está registrado",
+            )
+
+        clave_encriptada = hash_password(datos_veterinario.password)
+
+        try:
+            return self.usuario_repositorio.crear_usuario(
+                datos_veterinario, clave_encriptada, rol="veterinario"
+            )
+        except pyodbc.IntegrityError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="El correo electrónico o el DNI ya están registrados",

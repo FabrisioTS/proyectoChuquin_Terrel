@@ -43,7 +43,14 @@
                 </div>
                 <div class="overflow-hidden">
                     <h4 class="truncate text-xs font-bold text-slate-900">{{ nombreCompleto() }}</h4>
-                    <p class="text-[10px] font-medium text-slate-500">{{ rolEtiqueta() }}</p>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <p class="text-[10px] font-medium text-slate-500">{{ rolEtiqueta() }}</p>
+                        @if (esAdmin()) {
+                        <span class="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.2 text-[9px] font-extrabold text-amber-800 border border-amber-200">
+                            ADMIN
+                        </span>
+                        }
+                    </div>
                 </div>
             </div>
 
@@ -108,7 +115,14 @@
             <div class="flex items-center gap-2 sm:gap-3">
                 <div class="flex items-center gap-2">
                     <div class="hidden text-right sm:block">
-                        <h5 class="text-xs font-bold leading-none text-slate-900">{{ nombreCompleto() }}</h5>
+                        <div class="flex items-center justify-end gap-1.5">
+                            <h5 class="text-xs font-bold leading-none text-slate-900">{{ nombreCompleto() }}</h5>
+                            @if (esAdmin()) {
+                            <span class="rounded-full bg-amber-100 px-1.5 py-0.2 text-[9px] font-black text-amber-800 border border-amber-200">
+                                ADMIN
+                            </span>
+                            }
+                        </div>
                         <p class="mt-0.5 text-[10px] text-slate-400">{{ rolEtiqueta() }}</p>
                     </div>
                     <div

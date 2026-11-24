@@ -98,6 +98,29 @@ export class PagosService {
         return pago;
     }
 
+    async registrarCobroDirecto(datos: {
+        concepto: string;
+        monto: number;
+        metodo?: string;
+        mascota_nombre?: string;
+        estado?: string;
+    }): Promise<Pago> {
+        const api = await firstValueFrom(
+            this.http
+                .post<PagoApi>(`${this.API}/directo`, {
+                    concepto: datos.concepto,
+                    monto: datos.monto,
+                    metodo: datos.metodo ?? 'Efectivo',
+                    mascota_nombre: datos.mascota_nombre || null,
+                    estado: datos.estado ?? 'Pagado',
+                })
+                .pipe(catchError(manejarErrorHttp)),
+        );
+        const pago = mapearPago(api);
+        this._pagos.update((pagos) => [pago, ...pagos]);
+        return pago;
+    }
+
     async marcarPagado(id: number): Promise<void> {
         const api = await firstValueFrom(
             this.http
