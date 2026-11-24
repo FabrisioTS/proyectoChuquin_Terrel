@@ -4,9 +4,10 @@ import { email, form, FormField, maxLength, required } from '@angular/forms/sign
 
 import { AutenticacionService } from '../../services/autenticacion-service';
 import { UsuarioLogin } from '../../interfaces/Usuario';
+import { RecuperarPassword } from './recuperar-password/recuperar-password';
 
 @Component({
-  imports: [FormField, RouterLink],
+  imports: [FormField, RouterLink, RecuperarPassword],
   selector: 'app-log-in',
   styleUrl: './log-in.css',
   templateUrl: './log-in.html',
@@ -31,6 +32,21 @@ export class LogIn {
   cargando = signal<boolean>(false);
   mensajeError = signal<string | null>(null);
   mostrarPassword = signal<boolean>(false);
+  modalRecuperacion = signal<boolean>(false);
+
+  abrirRecuperacion(): void {
+    this.mensajeError.set(null);
+    this.modalRecuperacion.set(true);
+  }
+
+  cerrarRecuperacion(): void {
+    this.modalRecuperacion.set(false);
+  }
+
+  alRecuperarPassword(correo: string): void {
+    this.usuarioModelo.update((usuario) => ({ ...usuario, email: correo }));
+    this.mensajeError.set(null);
+  }
 
   guardar(evento: Event): void {
     evento.preventDefault();
@@ -54,14 +70,14 @@ export class LogIn {
             icon: 'success',
             title: `Bienvenido, ${respuesta.usuario.nombres}`,
             text: 'Has iniciado sesión correctamente.',
-            confirmButtonText: 'Ir al dashboard',
+            confirmButtonText: 'Continuar',
             confirmButtonColor: '#c2410c',
           });
         } catch {
-          // Si el modal falla, no se bloquea el acceso al dashboard.
+          // Si el modal falla, no se bloquea el acceso al portal.
         }
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([this.autenticacionService.rutaInicio()]);
       },
       error: (err: Error) => {
         this.cargando.set(false);

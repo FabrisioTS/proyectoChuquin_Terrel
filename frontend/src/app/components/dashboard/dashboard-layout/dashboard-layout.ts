@@ -20,6 +20,11 @@ import { filter } from 'rxjs/operators';
 
 import { AutenticacionService } from '../../../services/autenticacion-service';
 import { MascotasService } from '../../../services/mascotas-service';
+import { CitasService } from '../../../services/citas-service';
+import { HistorialService } from '../../../services/historial-service';
+import { VacunasService } from '../../../services/vacunas-service';
+import { PagosService } from '../../../services/pagos-service';
+import { ProductosService } from '../../../services/productos-service';
 import { ConfiguracionService } from '../../../services/configuracion-service';
 import { NotificacionesService } from '../../../services/notificaciones-service';
 import { BusquedaService } from '../../../services/busqueda-service';
@@ -40,6 +45,11 @@ interface ItemMenu {
 export class DashboardLayout {
     private autenticacionService = inject(AutenticacionService);
     private mascotasService = inject(MascotasService);
+    private citasService = inject(CitasService);
+    private historialService = inject(HistorialService);
+    private vacunasService = inject(VacunasService);
+    private pagosService = inject(PagosService);
+    private productosService = inject(ProductosService);
     private configuracionService = inject(ConfiguracionService);
     private notificacionesService = inject(NotificacionesService);
     private busquedaService = inject(BusquedaService);
@@ -127,6 +137,24 @@ export class DashboardLayout {
                 this.busquedaService.limpiar();
                 this.irAlInicio();
             });
+
+        // Las cargas iniciales solo se ejecutan en el navegador: el SSR no
+        // tiene token ni localStorage y recibiría 401.
+        if (isPlatformBrowser(this.platformId)) {
+            void this.cargarDatos();
+        }
+    }
+
+    private async cargarDatos(): Promise<void> {
+        await Promise.all([
+            this.mascotasService.cargar(),
+            this.citasService.cargar(),
+            this.historialService.cargar(),
+            this.vacunasService.cargar(),
+            this.pagosService.cargar(),
+            this.productosService.cargar(),
+            this.configuracionService.cargar(),
+        ]);
     }
 
     actualizarBusqueda(evento: Event): void {

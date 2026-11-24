@@ -1,16 +1,27 @@
+import secrets
+
+import jwt
 import pyodbc
 from fastapi import HTTPException, status
 
 from ..core.segurity import (
     crear_token_acceso,
+    crear_token_recuperacion,
+    decodificar_token_recuperacion,
     hash_password,
+    huella_password,
     necesita_rehash,
     verificar_password,
 )
 from ..models.usuario_model import Usuario
 from ..repositories.usuario_repository import UsuarioRepository
 from ..schemas.usuario_esquema import (
+    CambiarPassword,
+    RecuperarPasswordRespuesta,
+    RecuperarPasswordSolicitud,
+    RestablecerPassword,
     TokenResponse,
+    UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
     UsuarioResponse,
@@ -76,7 +87,7 @@ class UsuarioService:
                 usuario.id, hash_password(datos_login.password)
             )
 
-        token = crear_token_acceso(usuario.id, usuario.email)
+        token = crear_token_acceso(usuario.id, usuario.email, usuario.rol)
 
         return TokenResponse(
             access_token=token,
@@ -95,8 +106,6 @@ class UsuarioService:
             )
 
         return usuario
-<<<<<<< Updated upstream
-=======
 
     def actualizar_perfil(
         self, usuario: Usuario, datos: UsuarioActualizar
@@ -125,11 +134,7 @@ class UsuarioService:
         usuario = self.usuario_repositorio.obtener_usuario_por_email(datos.email)
 
         # Mensaje genérico: no se revela si falló el correo o el DNI.
-        if (
-            not usuario
-            or not usuario.dni
-            or not secrets.compare_digest(usuario.dni, datos.dni)
-        ):
+        if not usuario or not secrets.compare_digest(usuario.dni, datos.dni):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Los datos no coinciden con una cuenta registrada",
@@ -205,4 +210,3 @@ class UsuarioService:
         )
 
         return {"mensaje": "Contraseña actualizada correctamente."}
->>>>>>> Stashed changes

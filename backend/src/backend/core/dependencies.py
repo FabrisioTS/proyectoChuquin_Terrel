@@ -46,3 +46,21 @@ def get_current_user(
 
     servicio = UsuarioService(UsuarioRepository(conexion))
     return servicio.obtener_usuario_actual(usuario_id)
+
+
+def requiere_roles(*roles: str):
+    """Dependencia reutilizable: exige que el usuario tenga uno de esos roles."""
+
+    def verificar(usuario: Usuario = Depends(get_current_user)) -> Usuario:
+        if usuario.rol not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No tienes permisos para realizar esta acción",
+            )
+        return usuario
+
+    return verificar
+
+
+get_current_veterinario = requiere_roles("veterinario", "admin")
+get_current_admin = requiere_roles("admin")

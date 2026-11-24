@@ -68,29 +68,15 @@ class PagoRepository:
         return _fila_a_pago(fila) if fila else None
 
     def siguiente_codigo(self) -> str:
-        """Devuelve el siguiente código libre, sin depender del total de filas.
-
-        Usar COUNT(*) provocaba códigos duplicados si se eliminaba un pago.
-        """
         cursor = self.conexion.cursor()
 
         try:
-            cursor.execute(
-                "SELECT codigo FROM pagos WHERE codigo LIKE 'PAG-%'"
-            )
-            filas = cursor.fetchall()
+            cursor.execute("SELECT COUNT(*) FROM pagos")
+            total = cursor.fetchone()[0]
         finally:
             cursor.close()
 
-        maximo = 0
-
-        for (codigo,) in filas:
-            sufijo = str(codigo)[4:]
-
-            if sufijo.isdigit():
-                maximo = max(maximo, int(sufijo))
-
-        return f"PAG-{maximo + 1:04d}"
+        return f"PAG-{total + 1:04d}"
 
     def crear(
         self,

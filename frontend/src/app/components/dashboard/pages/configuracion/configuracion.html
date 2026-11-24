@@ -13,7 +13,7 @@
         <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm sm:p-6 lg:col-span-7">
             <div class="mb-4 flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-50 text-lg text-accent-800">
-                    👤</div>
+                    <span class="icono-material" aria-hidden="true">person</span></div>
                 <div>
                     <h2 class="text-base font-extrabold text-slate-900">Datos del propietario</h2>
                     <p class="text-xs text-slate-500">Esta información aparece en tu perfil y comprobantes.</p>
@@ -47,8 +47,9 @@
 
                 <label class="block">
                     <span class="text-[11px] font-bold text-slate-600">DNI</span>
-                    <input formControlName="dni" type="text" maxlength="8" placeholder="12345678"
-                        class="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-accent-600 focus:bg-white" />
+                    <input formControlName="dni" type="text" maxlength="8" readonly
+                        class="mt-1 w-full cursor-not-allowed rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs text-slate-500 outline-none" />
+                    <span class="mt-1 block text-[10px] text-slate-400">El DNI no se puede modificar.</span>
                 </label>
 
                 <label class="block">
@@ -62,9 +63,9 @@
                 </label>
 
                 <div class="flex items-end gap-2 sm:col-span-2">
-                    <button type="submit"
-                        class="rounded-xl bg-[#c2410c] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 hover:bg-[#9a3412]">
-                        Guardar cambios
+                    <button type="submit" [disabled]="guardando"
+                        class="rounded-xl bg-[#c2410c] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 hover:bg-[#9a3412] disabled:cursor-not-allowed disabled:opacity-50">
+                        {{ guardando ? 'Guardando...' : 'Guardar cambios' }}
                     </button>
                 </div>
             </form>
@@ -75,7 +76,7 @@
             <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm sm:p-6">
                 <div class="mb-4 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-50 text-lg text-brand-800">
-                        🔔</div>
+                        <span class="icono-material" aria-hidden="true">notifications</span></div>
                     <div>
                         <h2 class="text-base font-extrabold text-slate-900">Notificaciones</h2>
                         <p class="text-xs text-slate-500">Elige qué recordatorios quieres recibir.</p>
@@ -130,9 +131,116 @@
                     </div>
                 </div>
                 <p class="mt-4 border-t border-accent-100 pt-3 text-[10px] leading-relaxed text-accent-800">
-                    Los cambios se guardan en este navegador. La edición de perfil en el servidor se habilitará cuando
-                    el backend exponga el endpoint correspondiente.
+                    Tus datos y preferencias se guardan de forma segura en el servidor de la clínica.
                 </p>
+            </section>
+
+            <!-- Seguridad de la cuenta -->
+            <section class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm sm:p-6">
+                <div class="mb-4 flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-lg text-slate-700">
+                        <span class="icono-material" aria-hidden="true">lock</span></div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-slate-900">Seguridad de la cuenta</h2>
+                        <p class="text-xs text-slate-500">Cambia tu contraseña de acceso al portal.</p>
+                    </div>
+                </div>
+
+                <form [formGroup]="formularioPassword" (ngSubmit)="cambiarPassword()" class="space-y-3">
+                    <label class="block">
+                        <span class="text-[11px] font-bold text-slate-600">Contraseña actual *</span>
+                        <div class="relative mt-1">
+                            <input formControlName="password_actual"
+                                [type]="mostrarPasswordActual ? 'text' : 'password'"
+                                autocomplete="current-password" placeholder="••••••••"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pr-10 text-xs outline-none focus:border-accent-600 focus:bg-white" />
+                            <button type="button" (click)="mostrarPasswordActual = !mostrarPasswordActual"
+                                [attr.aria-label]="mostrarPasswordActual ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'"
+                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        @if (formularioPassword.controls.password_actual.touched &&
+                        formularioPassword.controls.password_actual.invalid) {
+                        <p class="mt-1 text-[10px] text-red-600">Ingresa tu contraseña actual.</p>
+                        }
+                    </label>
+
+                    <label class="block">
+                        <span class="text-[11px] font-bold text-slate-600">Nueva contraseña *</span>
+                        <div class="relative mt-1">
+                            <input formControlName="password" [type]="mostrarPasswordNueva ? 'text' : 'password'"
+                                autocomplete="new-password" placeholder="Mínimo 8 caracteres"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pr-10 text-xs outline-none focus:border-accent-600 focus:bg-white" />
+                            <button type="button" (click)="mostrarPasswordNueva = !mostrarPasswordNueva"
+                                [attr.aria-label]="mostrarPasswordNueva ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'"
+                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        @if (formularioPassword.controls.password.touched &&
+                        formularioPassword.controls.password.invalid) {
+                        <p class="mt-1 text-[10px] text-red-600">
+                            Debe tener entre 8 y 72 caracteres e incluir al menos una letra y un número.
+                        </p>
+                        }
+                    </label>
+
+                    <label class="block">
+                        <span class="text-[11px] font-bold text-slate-600">Confirmar nueva contraseña *</span>
+                        <div class="relative mt-1">
+                            <input formControlName="confirmar_password"
+                                [type]="mostrarPasswordConfirmacion ? 'text' : 'password'" autocomplete="new-password"
+                                placeholder="Repite la nueva contraseña"
+                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 pr-10 text-xs outline-none focus:border-accent-600 focus:bg-white" />
+                            <button type="button" (click)="mostrarPasswordConfirmacion = !mostrarPasswordConfirmacion"
+                                [attr.aria-label]="mostrarPasswordConfirmacion ? 'Ocultar confirmación' : 'Mostrar confirmación'"
+                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                        @if (formularioPassword.controls.confirmar_password.touched &&
+                        formularioPassword.controls.confirmar_password.invalid) {
+                        <p class="mt-1 text-[10px] text-red-600">Confirma tu nueva contraseña.</p>
+                        }
+                    </label>
+
+                    @if (errorPassword) {
+                    <p class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-[10px] text-red-700">
+                        {{ errorPassword }}
+                    </p>
+                    }
+
+                    @if (exitoPassword) {
+                    <p class="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-[10px] text-emerald-700">
+                        {{ exitoPassword }}
+                    </p>
+                    }
+
+                    <button type="submit" [disabled]="cambiandoPassword"
+                        class="w-full rounded-xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-slate-900/20 transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+                        @if (cambiandoPassword) {
+                        Actualizando...
+                        } @else {
+                        Cambiar contraseña
+                        }
+                    </button>
+                </form>
             </section>
         </aside>
     </div>

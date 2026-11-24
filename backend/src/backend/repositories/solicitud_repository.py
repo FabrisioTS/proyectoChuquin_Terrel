@@ -1,24 +1,25 @@
 import pyodbc
 
-from ..models.solicitud_model import Solicitud
-from ..schemas.solicitud_esquema import SolicitudCrear
+from ..models.solicitud_model import SolicitudCita
+from ..schemas.solicitud_esquema import SolicitudCitaCrear
 
 COLUMNAS_SOLICITUD = (
-    "id, tipo, nombre, telefono, email, mascota, motivo, mensaje, estado, "
-    "creado_en"
+    "id, tipo_mascota, nombre_propietario, telefono, nombre_mascota, "
+    "servicio, fecha_deseada, turno, notas, estado, creado_en"
 )
 
 
-def _fila_a_solicitud(fila: pyodbc.Row) -> Solicitud:
-    return Solicitud(
+def _fila_a_solicitud(fila: pyodbc.Row) -> SolicitudCita:
+    return SolicitudCita(
         id=fila.id,
-        tipo=fila.tipo,
-        nombre=fila.nombre,
+        tipo_mascota=fila.tipo_mascota,
+        nombre_propietario=fila.nombre_propietario,
         telefono=fila.telefono,
-        email=fila.email,
-        mascota=fila.mascota,
-        motivo=fila.motivo,
-        mensaje=fila.mensaje,
+        nombre_mascota=fila.nombre_mascota,
+        servicio=fila.servicio,
+        fecha_deseada=fila.fecha_deseada,
+        turno=fila.turno,
+        notas=fila.notas,
         estado=fila.estado,
         creado_en=fila.creado_en,
     )
@@ -28,70 +29,43 @@ class SolicitudRepository:
     def __init__(self, conexion: pyodbc.Connection):
         self.conexion = conexion
 
-    def crear(self, datos: SolicitudCrear) -> Solicitud:
+    def crear(self, datos: SolicitudCitaCrear) -> SolicitudCita:
         consulta = f"""
-            INSERT INTO solicitudes
-                (tipo, nombre, telefono, email, mascota, motivo, mensaje)
+            INSERT INTO solicitudes_cita
+                (tipo_mascota, nombre_propietario, telefono, nombre_mascota,
+                 servicio, fecha_deseada, turno, notas, estado)
             OUTPUT INSERTED.{COLUMNAS_SOLICITUD.replace(", ", ", INSERTED.")}
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')
         """
-
         cursor = self.conexion.cursor()
-
         try:
             cursor.execute(
                 consulta,
-                datos.tipo,
-                datos.nombre,
+                datos.tipo_mascota,
+                datos.nombre_propietario,
                 datos.telefono,
-                datos.email,
-                datos.mascota,
-                datos.motivo,
-                datos.mensaje,
+                datos.nombre_mascota,
+                datos.servicio,
+                datos.fecha_deseada,
+                datos.turno,
+                datos.notas,
             )
             fila = cursor.fetchone()
         finally:
             cursor.close()
 
         if fila is None:
-            raise RuntimeError("No se pudo registrar la solicitud")
-
+            raise RuntimeError("No se pudo registrar la solicitud de cita")
         return _fila_a_solicitud(fila)
 
-    def listar(self, estado: str | None = None) -> list[Solicitud]:
-        consulta = f"SELECT {COLUMNAS_SOLICITUD} FROM solicitudes"
-        parametros: list[object] = []
-
-        if estado:
-            consulta += " WHERE estado = ?"
-            parametros.append(estado)
-
-        consulta += " ORDER BY creado_en DESC, id DESC"
-
+    def listar(self) -> list[SolicitudCita]:
+        consulta = (
+            f"SELECT {COLUMNAS_SOLICITUD} FROM solicitudes_cita ORDER BY creado_en DESC"
+        )
         cursor = self.conexion.cursor()
-
         try:
-            cursor.execute(consulta, parametros)
+            cursor.execute(consulta)
             filas = cursor.fetchall()
         finally:
             cursor.close()
-
         return [_fila_a_solicitud(fila) for fila in filas]
-
-    def marcar_atendida(self, solicitud_id: int) -> Solicitud | None:
-        consulta = f"""
-            UPDATE solicitudes
-            SET estado = 'Atendida'
-            OUTPUT INSERTED.{COLUMNAS_SOLICITUD.replace(", ", ", INSERTED.")}
-            WHERE id = ?
-        """
-
-        cursor = self.conexion.cursor()
-
-        try:
-            cursor.execute(consulta, solicitud_id)
-            fila = cursor.fetchone()
-        finally:
-            cursor.close()
-
-        return _fila_a_solicitud(fila) if fila else None

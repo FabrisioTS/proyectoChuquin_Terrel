@@ -140,7 +140,7 @@ class CitaRepository:
     def actualizar(self, cita_id: int, datos: CitaActualizar) -> Cita | None:
         consulta = f"""
             UPDATE citas
-            SET motivo = ?, doctor = ?, fecha = ?, hora = ?, estado = 'Pendiente'
+            SET motivo = ?, doctor = ?, fecha = ?, hora = ?
             OUTPUT INSERTED.{COLUMNAS_CITA.replace(", ", ", INSERTED.")}
             WHERE id = ?
         """

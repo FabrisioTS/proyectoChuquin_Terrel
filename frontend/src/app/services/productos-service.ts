@@ -1,26 +1,54 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { AlmacenamientoService } from './almacenamiento-service';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+import { environment } from '../../environments/environment';
+import { manejarErrorHttp } from '../utils/error-http';
 import {
     CategoriaProducto,
     ItemCarrito,
     ItemCarritoDetalle,
     Producto,
 } from '../interfaces/Producto';
-import { PRODUCTOS_SEMILLA } from '../data/productos';
 
-// v2: catálogo con imágenes reales. La clave anterior se descarta una sola vez.
-const CLAVE_PRODUCTOS = 'portal_productos_v2';
-const CLAVE_CARRITO = 'portal_carrito_v2';
+interface ProductoApi {
+    id: number;
+    nombre: string;
+    categoria: string;
+    precio: number;
+    stock: number;
+    descripcion: string | null;
+    emoji: string | null;
+    imagen: string | null;
+    activo: boolean;
+}
+
+function mapearProducto(api: ProductoApi): Producto {
+    return {
+        id: api.id,
+        nombre: api.nombre,
+        categoria: api.categoria as CategoriaProducto,
+        precio: api.precio,
+        stock: api.stock,
+        descripcion: api.descripcion ?? '',
+        emoji: api.emoji ?? '',
+        imagen: api.imagen ?? '',
+    };
+}
 
 @Injectable({
     providedIn: 'root',
 })
 export class ProductosService {
-    private almacenamiento = inject(AlmacenamientoService);
-    private _productos = signal<Producto[]>(
-        this.almacenamiento.leer(CLAVE_PRODUCTOS, PRODUCTOS_SEMILLA),
-    );
-    private _carrito = signal<ItemCarrito[]>(this.almacenamiento.leer(CLAVE_CARRITO, []));
+    private http = inject(HttpClient);
+    private readonly API = `${environment.apiUrl}/productos`;
+
+    private _productos = signal<Producto[]>([]);
+    private _carrito = signal<ItemCarrito[]>([]);
+
+    readonly cargando = signal(false);
+    readonly error = signal<string | null>(null);
 
     readonly productos = this._productos.asReadonly();
     readonly categorias: CategoriaProducto[] = [
@@ -61,6 +89,24 @@ export class ProductosService {
         this.itemsCarrito().reduce((total, item) => total + item.subtotal, 0),
     );
 
+    async cargar(): Promise<void> {
+        this.cargando.set(true);
+        this.error.set(null);
+
+        try {
+            const datos = await firstValueFrom(
+                this.http
+                    .get<ProductoApi[]>(`${this.API}/`)
+                    .pipe(catchError(manejarErrorHttp)),
+            );
+            this._productos.set(datos.map(mapearProducto));
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.cargando.set(false);
+        }
+    }
+
     agregar(productoId: number): void {
         const producto = this._productos().find((item) => item.id === productoId);
 
@@ -80,7 +126,6 @@ export class ProductosService {
         }
 
         this._carrito.update((carrito) => [...carrito, { productoId, cantidad: 1 }]);
-        this.persistirCarrito();
     }
 
     cambiarCantidad(productoId: number, cantidad: number): void {
@@ -97,40 +142,15 @@ export class ProductosService {
                 item.productoId === productoId ? { ...item, cantidad: cantidadFinal } : item,
             ),
         );
-        this.persistirCarrito();
-    }
-
-    descontarStock(items: ItemCarritoDetalle[]): void {
-        this._productos.update((productos) =>
-            productos.map((producto) => {
-                const item = items.find((detalle) => detalle.producto.id === producto.id);
-
-                if (!item) {
-                    return producto;
-                }
-
-                return {
-                    ...producto,
-                    stock: Math.max(0, producto.stock - item.cantidad),
-                };
-            }),
-        );
-        this.almacenamiento.guardar(CLAVE_PRODUCTOS, this._productos());
     }
 
     quitar(productoId: number): void {
         this._carrito.update((carrito) =>
             carrito.filter((item) => item.productoId !== productoId),
         );
-        this.persistirCarrito();
     }
 
     vaciarCarrito(): void {
         this._carrito.set([]);
-        this.persistirCarrito();
-    }
-
-    private persistirCarrito(): void {
-        this.almacenamiento.guardar(CLAVE_CARRITO, this._carrito());
     }
 }

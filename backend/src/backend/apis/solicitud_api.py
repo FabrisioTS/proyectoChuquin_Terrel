@@ -1,53 +1,42 @@
 import pyodbc
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, status
 
 from ..core.dependencies import get_current_veterinario
 from ..database.conection import get_db
 from ..models.usuario_model import Usuario
 from ..repositories.solicitud_repository import SolicitudRepository
 from ..schemas.solicitud_esquema import (
-    EstadoSolicitud,
-    SolicitudCrear,
-    SolicitudRespuesta,
+    SolicitudCitaCrear,
+    SolicitudCitaRespuesta,
 )
 from ..services.solicitud_service import SolicitudService
 
-solicitud_router = APIRouter(prefix="/solicitudes", tags=["Solicitudes"])
+solicitud_router = APIRouter(prefix="/solicitudes", tags=["Solicitudes de Citas"])
 
 
 @solicitud_router.post(
-    "/", response_model=SolicitudRespuesta, status_code=status.HTTP_201_CREATED
+    "/",
+    response_model=SolicitudCitaRespuesta,
+    status_code=status.HTTP_201_CREATED,
 )
-def crear_solicitud(
-    datos: SolicitudCrear,
+def registrar_solicitud(
+    datos: SolicitudCitaCrear,
     conexion: pyodbc.Connection = Depends(get_db),
 ):
-    """Formulario público: no requiere autenticación."""
+    """Endpoint público: registra la solicitud de cita enviada desde la web."""
     servicio = SolicitudService(SolicitudRepository(conexion))
-    return servicio.crear(datos)
+    return servicio.registrar_solicitud(datos)
 
 
 @solicitud_router.get(
-    "/", response_model=list[SolicitudRespuesta], status_code=status.HTTP_200_OK
-)
-def listar_solicitudes(
-    estado: EstadoSolicitud | None = Query(default=None),
-    _: Usuario = Depends(get_current_veterinario),
-    conexion: pyodbc.Connection = Depends(get_db),
-):
-    servicio = SolicitudService(SolicitudRepository(conexion))
-    return servicio.listar(estado)
-
-
-@solicitud_router.put(
-    "/{solicitud_id}/atendida",
-    response_model=SolicitudRespuesta,
+    "/",
+    response_model=list[SolicitudCitaRespuesta],
     status_code=status.HTTP_200_OK,
 )
-def marcar_atendida(
-    solicitud_id: int,
+def listar_solicitudes(
     _: Usuario = Depends(get_current_veterinario),
     conexion: pyodbc.Connection = Depends(get_db),
 ):
+    """Bandeja administrativa para veterinarios."""
     servicio = SolicitudService(SolicitudRepository(conexion))
-    return servicio.marcar_atendida(solicitud_id)
+    return servicio.listar_solicitudes()

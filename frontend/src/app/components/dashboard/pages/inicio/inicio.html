@@ -13,7 +13,7 @@
                 SEDE CENTRAL PARQUE TUPAC  ABIERTO 24/7
             </span>
             <h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                {{ saludo() }}, {{ usuario()?.nombres ?? 'propietario' }} 👋
+                {{ saludo() }}, {{ usuario()?.nombres ?? 'propietario' }} <span class="icono-material" aria-hidden="true">waving_hand</span>
             </h1>
             <p class="text-xs leading-relaxed text-white/85 sm:text-sm">
                 Aquí tienes el estado de salud, citas y recordatorios preventivos de
@@ -37,7 +37,7 @@
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Mascotas
                     registradas</span>
-                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800">🐾
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800"><span class="icono-material" aria-hidden="true">pets</span>
                 </div>
             </div>
             <div>
@@ -49,14 +49,14 @@
             </div>
             <a routerLink="/dashboard/mascotas"
                 class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-accent-800 hover:underline">
-                <span>Gestionar mascotas</span><span>→</span>
+                <span>Gestionar mascotas</span><span class="icono-material" aria-hidden="true">arrow_forward</span>
             </a>
         </article>
 
         <article class="flex flex-col justify-between space-y-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Próxima cita</span>
-                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800">📅
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800"><span class="icono-material" aria-hidden="true">calendar_month</span>
                 </div>
             </div>
             <div>
@@ -72,7 +72,7 @@
             </div>
             <a routerLink="/dashboard/citas"
                 class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-accent-800 hover:underline">
-                <span>Ver agenda</span><span>→</span>
+                <span>Ver agenda</span><span class="icono-material" aria-hidden="true">arrow_forward</span>
             </a>
         </article>
 
@@ -80,7 +80,7 @@
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Vacunas y
                     protección</span>
-                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800">💉
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800"><span class="icono-material" aria-hidden="true">vaccines</span>
                 </div>
             </div>
             <div>
@@ -100,7 +100,7 @@
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Historiales
                     clínicos</span>
-                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800">📋
+                <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-50 text-sm text-accent-800"><span class="icono-material" aria-hidden="true">assignment</span>
                 </div>
             </div>
             <div>
@@ -112,7 +112,7 @@
             </div>
             <a routerLink="/dashboard/historial"
                 class="flex items-center justify-between border-t border-slate-100 pt-3 text-[10px] font-bold text-accent-800 hover:underline">
-                <span>Ver historial completo</span><span>→</span>
+                <span>Ver historial completo</span><span class="icono-material" aria-hidden="true">arrow_forward</span>
             </a>
         </article>
     </section>
@@ -123,7 +123,7 @@
             <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-50 text-lg text-accent-800">
-                        📅</div>
+                        <span class="icono-material" aria-hidden="true">calendar_month</span></div>
                     <div>
                         <h2 class="text-base font-extrabold leading-none text-slate-900">Próxima cita programada</h2>
                         <p class="mt-0.5 text-xs text-slate-400">Turno reservado y verificado</p>
@@ -141,7 +141,7 @@
                 <div class="flex items-center gap-3">
                     <div
                         class="flex h-12 w-12 items-center justify-center rounded-xl border border-white bg-white text-xl shadow-sm">
-                        🐶</div>
+                        <span class="icono-material" aria-hidden="true">pets</span></div>
                     <div>
                         <span class="text-[10px] font-extrabold uppercase tracking-wider text-accent-800">PACIENTE:
                             {{ cita.mascotaNombre }}</span>
@@ -164,7 +164,7 @@
                 </div>
 
                 <div class="flex items-start gap-2 rounded-xl border border-slate-100 bg-white/80 p-3 text-xs text-slate-600">
-                    <span class="text-sm font-bold text-accent-800">ⓘ</span>
+                    <span class="icono-material text-sm font-bold text-accent-800" aria-hidden="true">info</span>
                     <p class="text-[11px] leading-relaxed">{{ cita.indicaciones }}</p>
                 </div>
             </div>
@@ -184,7 +184,7 @@
                     Gestionar mis citas
                 </a>
                 <a routerLink="/dashboard/vacunas" class="flex items-center gap-1 font-bold text-accent-800 hover:underline">
-                    💉 Ver calendario de vacunación
+                    <span class="icono-material" aria-hidden="true">vaccines</span> Ver calendario de vacunación
                 </a>
             </div>
         </article>
@@ -193,7 +193,7 @@
             <div>
                 <div class="flex items-center gap-3 pb-2">
                     <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-brand-50 text-lg text-brand-800">
-                        🛡️</div>
+                        <span class="icono-material" aria-hidden="true">health_and_safety</span></div>
                     <div>
                         <h2 class="text-base font-extrabold leading-none text-slate-900">Recordatorios preventivos</h2>
                         <p class="mt-0.5 text-xs text-slate-400">Vacunas y tratamientos por atender</p>
@@ -240,7 +240,7 @@
                 <h2 class="text-lg font-extrabold text-slate-900">Actividad clínica reciente</h2>
                 <p class="text-xs text-slate-500">Últimas atenciones registradas en el portal</p>
             </div>
-            <a routerLink="/dashboard/historial" class="text-xs font-bold text-accent-800 hover:underline">Ver todo →</a>
+            <a routerLink="/dashboard/historial" class="text-xs font-bold text-accent-800 hover:underline">Ver todo <span class="icono-material" aria-hidden="true">arrow_forward</span></a>
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-3">

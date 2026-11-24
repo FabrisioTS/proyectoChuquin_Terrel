@@ -7,14 +7,22 @@
             <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">Historial Médico</h1>
             <p class="mt-1 text-xs text-slate-500">Consultas, diagnósticos y recetas de tus mascotas.</p>
         </div>
+        @if (puedeEscribir()) {
         <button (click)="abrirFormulario()"
             class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#c2410c] px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 transition-all hover:-translate-y-0.5 hover:bg-[#9a3412]">
             <span class="text-base leading-none">+</span> Registrar consulta
         </button>
+        }
     </header>
 
+    @if (error()) {
+    <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
+        {{ error() }}
+    </div>
+    }
+
     <!-- Formulario -->
-    @if (mostrarFormulario()) {
+    @if (mostrarFormulario() && puedeEscribir()) {
     <section class="rounded-3xl border border-accent-100 bg-white p-5 shadow-sm sm:p-6">
         <div class="mb-4 flex items-center justify-between">
             <div>
@@ -82,9 +90,9 @@
             </label>
 
             <div class="flex items-end gap-2 sm:col-span-2">
-                <button type="submit"
-                    class="rounded-xl bg-[#c2410c] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 hover:bg-[#9a3412]">
-                    Guardar consulta
+                <button type="submit" [disabled]="guardando()"
+                    class="rounded-xl bg-[#c2410c] px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-[#c2410c]/20 hover:bg-[#9a3412] disabled:cursor-not-allowed disabled:opacity-50">
+                    {{ guardando() ? 'Guardando...' : 'Guardar consulta' }}
                 </button>
                 <button type="button" (click)="cerrarFormulario()"
                     class="rounded-xl bg-slate-100 px-5 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-200">
@@ -119,7 +127,7 @@
                 <div class="flex gap-3">
                     <div
                         class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent-50 text-lg text-accent-800">
-                        📋</div>
+                        <span class="icono-material" aria-hidden="true">assignment</span></div>
                     <div>
                         <div class="flex flex-wrap items-center gap-2">
                             <h2 class="text-sm font-extrabold text-slate-900">{{ registro.motivo }}</h2>
@@ -149,10 +157,12 @@
                     <p class="mt-1 text-[11px] leading-relaxed text-slate-700">{{ registro.receta }}</p>
                 </div>
                 }
+                @if (puedeEscribir()) {
                 <div class="flex justify-end">
                     <button (click)="eliminar(registro)"
                         class="text-[11px] font-bold text-rose-600 hover:underline">Eliminar registro</button>
                 </div>
+                }
             </div>
             }
         </article>

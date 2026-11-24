@@ -9,7 +9,7 @@
         </div>
         <span
             class="inline-flex items-center justify-center gap-2 rounded-full bg-accent-50 px-3 py-1.5 text-xs font-bold text-accent-800">
-            🛒 {{ cantidadTotal() }} artículo(s) en el carrito
+            <span class="icono-material" aria-hidden="true">shopping_cart</span> {{ cantidadTotal() }} artículo(s) en el carrito
         </span>
     </header>
 
@@ -111,7 +111,8 @@
                                 </div>
                             </div>
                             <button (click)="quitar(item.producto)"
-                                class="text-[11px] font-bold text-rose-500 hover:text-rose-700">✕</button>
+                                class="text-[11px] font-bold text-rose-500 hover:text-rose-700"><span
+                                    class="icono-material" aria-hidden="true">close</span></button>
                         </div>
 
                         <div class="mt-3 flex items-center justify-between">
@@ -127,7 +128,7 @@
                     </div>
                     } @empty {
                     <div class="rounded-2xl bg-slate-50 px-4 py-8 text-center">
-                        <p class="text-2xl">🛒</p>
+                        <p class="text-2xl"><span class="icono-material" aria-hidden="true">shopping_cart</span></p>
                         <p class="mt-2 text-xs font-bold text-slate-700">Tu carrito está vacío</p>
                         <p class="mt-1 text-[10px] text-slate-400">Agrega productos del catálogo.</p>
                     </div>

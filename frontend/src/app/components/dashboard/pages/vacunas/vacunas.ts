@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { VacunasService } from '../../../../services/vacunas-service';
 import { MascotasService } from '../../../../services/mascotas-service';
 import { BusquedaService } from '../../../../services/busqueda-service';
+import { AutenticacionService } from '../../../../services/autenticacion-service';
 import {
     EstadoRegistroSanitario,
     TipoRegistroSanitario,
@@ -23,6 +24,7 @@ export class Vacunas {
     private vacunasService = inject(VacunasService);
     private mascotasService = inject(MascotasService);
     private busquedaService = inject(BusquedaService);
+    private autenticacionService = inject(AutenticacionService);
     private fb = inject(FormBuilder);
 
     readonly total = this.vacunasService.total;
@@ -34,6 +36,11 @@ export class Vacunas {
     readonly mascotaFiltro = signal(0);
     readonly estadoFiltro = signal<FiltroEstado>('Todos');
     readonly mostrarFormulario = signal(false);
+    readonly guardando = signal(false);
+    readonly error = signal<string | null>(null);
+
+    /** El propietario solo consulta; la cartilla la escribe el veterinario. */
+    readonly puedeEscribir = this.autenticacionService.esVeterinario;
 
     readonly porcentaje = computed(() => {
         const total = this.total();
@@ -72,6 +79,7 @@ export class Vacunas {
     });
 
     abrirFormulario(): void {
+        this.error.set(null);
         this.formulario.reset({
             mascotaId: this.mascotas()[0]?.id ?? 0,
             nombre: '',
@@ -98,6 +106,7 @@ export class Vacunas {
         const mascota = this.mascotasService.obtener(Number(valor.mascotaId));
 
         if (!mascota) {
+            this.error.set('Selecciona una mascota válida.');
             return;
         }
 
@@ -111,10 +120,13 @@ export class Vacunas {
             observaciones: (valor.observaciones ?? '').trim(),
         };
 
-        this.vacunasService.crear(datos, mascota.nombre);
-        this.cerrarFormulario();
+        this.guardando.set(true);
+        this.error.set(null);
 
         try {
+            await this.vacunasService.crear(datos, mascota.nombre);
+            this.cerrarFormulario();
+
             const { default: Swal } = await import('sweetalert2');
             await Swal.fire({
                 icon: 'success',
@@ -122,8 +134,10 @@ export class Vacunas {
                 text: 'La cartilla de vacunación se actualizó.',
                 confirmButtonColor: '#c2410c',
             });
-        } catch {
-            // El registro ya quedó guardado.
+        } catch (error) {
+            this.error.set((error as Error).message);
+        } finally {
+            this.guardando.set(false);
         }
     }
 
@@ -147,7 +161,13 @@ export class Vacunas {
             // Sin modal, se elimina directamente.
         }
 
-        this.vacunasService.eliminar(vacuna.id);
+        this.error.set(null);
+
+        try {
+            await this.vacunasService.eliminar(vacuna.id);
+        } catch (error) {
+            this.error.set((error as Error).message);
+        }
     }
 
     estado(vacuna: Vacuna): EstadoRegistroSanitario {
@@ -170,6 +190,18 @@ export class Vacunas {
                 return 'bg-amber-50 text-amber-700';
             default:
                 return 'bg-rose-50 text-rose-700';
+        }
+    }
+
+    /** Icono Material Symbols que representa cada tipo de registro sanitario. */
+    iconoVacuna(tipo: TipoRegistroSanitario | string): string {
+        switch (tipo) {
+            case 'Vacuna':
+                return 'vaccines';
+            case 'Tratamiento':
+                return 'medication';
+            default:
+                return 'medication_liquid';
         }
     }
 

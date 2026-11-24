@@ -1,6 +1,5 @@
 from datetime import date
 
-import pyodbc
 from fastapi import HTTPException, status
 
 from ..models.pago_model import Pago
@@ -63,25 +62,14 @@ class PagoService:
 
         concepto = "Compra de tienda: " + ", ".join(detalle)
 
-        # El código es único (UX_pagos_codigo). Si otro proceso lo tomó
-        # entre la lectura y el INSERT, se reintenta con el siguiente.
-        for _ in range(3):
-            try:
-                return self.pago_repositorio.crear(
-                    usuario_id=usuario.id,
-                    codigo=self.pago_repositorio.siguiente_codigo(),
-                    concepto=concepto[:200],
-                    fecha=date.today(),
-                    monto=round(total, 2),
-                    metodo=datos.metodo,
-                    estado="Pagado",
-                )
-            except pyodbc.IntegrityError:
-                continue
-
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="No se pudo generar el código del comprobante. Inténtalo nuevamente.",
+        return self.pago_repositorio.crear(
+            usuario_id=usuario.id,
+            codigo=self.pago_repositorio.siguiente_codigo(),
+            concepto=concepto[:200],
+            fecha=date.today(),
+            monto=round(total, 2),
+            metodo=datos.metodo,
+            estado="Pagado",
         )
 
     def marcar_pagado(self, usuario: Usuario, pago_id: int) -> Pago:

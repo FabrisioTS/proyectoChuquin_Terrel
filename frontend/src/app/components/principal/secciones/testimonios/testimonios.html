@@ -1,0 +1,43 @@
+<!-- TESTIMONIOS -->
+<section id="testimonios" class="py-20 bg-slate-50 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <span class="text-xs font-bold uppercase tracking-widest text-brand-600">Historias reales</span>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                Familias que confían en nosotros
+            </h2>
+            <p class="text-slate-600 text-sm">
+                La tranquilidad de nuestros tutores es la mejor medida de nuestro trabajo.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @for (testimonio of testimonios; track testimonio.nombre) {
+            <figure
+                class="flex h-full flex-col justify-between gap-5 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm transition-shadow hover:shadow-lg">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-1 text-amber-400" aria-label="Calificación de 5 estrellas">
+                        <span class="icono-material relleno" aria-hidden="true">star</span><span class="icono-material relleno" aria-hidden="true">star</span><span class="icono-material relleno" aria-hidden="true">star</span><span class="icono-material relleno" aria-hidden="true">star</span><span class="icono-material relleno" aria-hidden="true">star</span>
+                    </div>
+                    <blockquote class="text-xs leading-relaxed text-slate-600">
+                        “{{ testimonio.texto }}”
+                    </blockquote>
+                </div>
+
+                <figcaption class="flex items-center gap-3 border-t border-slate-100 pt-4">
+                    <div
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-extrabold text-brand-700">
+                        {{ testimonio.iniciales }}
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-900">{{ testimonio.nombre }}</p>
+                        <p class="text-[11px] text-slate-400">{{ testimonio.mascota }}</p>
+                    </div>
+                </figcaption>
+            </figure>
+            }
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,9 @@
+.nav-link.nav-active {
+    background-image: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 14px -4px rgb(15 118 110 / 0.45);
+}
+
+.nav-link.nav-active .icono-material {
+    color: #ffffff;
+}

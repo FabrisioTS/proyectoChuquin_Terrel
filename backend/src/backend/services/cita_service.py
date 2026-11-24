@@ -2,7 +2,6 @@ from datetime import date
 
 from fastapi import HTTPException, status
 
-from ..core.clinica import DIRECCION_PRINCIPAL, SEDE_PRINCIPAL
 from ..models.cita_model import Cita
 from ..models.usuario_model import Usuario
 from ..repositories.cita_repository import CitaRepository
@@ -10,8 +9,8 @@ from ..repositories.mascota_repository import MascotaRepository
 from ..schemas.cita_esquema import CitaActualizar, CitaCrear
 from .alcance import nombre_completo, usuario_filtro
 
-SEDE_PREDETERMINADA = SEDE_PRINCIPAL
-DIRECCION_PREDETERMINADA = DIRECCION_PRINCIPAL
+SEDE_PREDETERMINADA = "Sede Central - San Carlos"
+DIRECCION_PREDETERMINADA = "Av. San Carlos 123"
 ESPECIALIDAD_PREDETERMINADA = "Medicina General"
 
 

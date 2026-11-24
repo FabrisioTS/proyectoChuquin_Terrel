@@ -1,18 +1,17 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 
 
 @dataclass
-class Solicitud:
-    """Solicitud enviada desde el portal público (cita, contacto o club)."""
-
+class SolicitudCita:
     id: int
-    tipo: str
-    nombre: str | None
-    telefono: str | None
-    email: str | None
-    mascota: str | None
-    motivo: str | None
-    mensaje: str | None
-    estado: str
+    tipo_mascota: str
+    nombre_propietario: str
+    telefono: str
+    nombre_mascota: str
+    servicio: str
+    fecha_deseada: date | None
+    turno: str | None
+    notas: str | None
+    estado: str = "Pendiente"
     creado_en: datetime | None = None

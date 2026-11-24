@@ -47,6 +47,33 @@ section[id] {
 }
 
 /* ==========================================================
+   Iconos Material Symbols Rounded
+   ========================================================== */
+
+.icono-material {
+    font-family: 'Material Symbols Rounded';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 1.1em;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    vertical-align: -0.125em;
+    user-select: none;
+}
+
+.icono-material.relleno {
+    font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ==========================================================
    Accesibilidad
    ========================================================== */
 

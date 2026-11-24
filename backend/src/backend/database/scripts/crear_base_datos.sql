@@ -12,9 +12,9 @@
 -- Los usuarios de prueba se insertan desde Python (con Argon2),
 -- en backend/database/inicializacion.py.
 --
--- El portal guarda toda su información (usuarios, mascotas, citas,
--- vacunas, historial, pagos, productos, configuración y solicitudes)
--- a través de FastAPI en esta base de datos.
+-- El frontend guarda su información en localStorage. Estas
+-- tablas dejan preparada la base para cuando se conecte la API:
+-- productos, mascotas, citas, vacunas, historial y pagos.
 --
 -- Ejecutar desde el proyecto:
 --   uv run python -m backend.database.scripts.crear_base_datos
@@ -339,8 +339,6 @@ BEGIN
     CREATE INDEX IX_pagos_estado ON dbo.pagos(estado);
 END
 GO
-<<<<<<< Updated upstream
-=======
 
 -- ==========================================================
 -- 8. MIGRACIONES PARA EL PORTAL (roles, baja lógica, FKs)
@@ -385,7 +383,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_historial_veterin
 BEGIN
     ALTER TABLE dbo.historial
         ADD CONSTRAINT FK_historial_veterinario
-            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
 END
 GO
 
@@ -399,7 +397,7 @@ IF NOT EXISTS (SELECT 1 FROM sys.foreign_keys WHERE name = 'FK_citas_veterinario
 BEGIN
     ALTER TABLE dbo.citas
         ADD CONSTRAINT FK_citas_veterinario
-            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE NO ACTION;
+            FOREIGN KEY (veterinario_id) REFERENCES dbo.usuarios(id) ON DELETE SET NULL;
 END
 GO
 
@@ -448,40 +446,34 @@ END
 GO
 
 -- ==========================================================
--- 10. SOLICITUDES DEL PORTAL PÚBLICO
+-- 10. SOLICITUDES DE CITAS (Formulario público de contacto)
 -- ==========================================================
 
-IF OBJECT_ID(N'dbo.solicitudes', N'U') IS NULL
+IF OBJECT_ID(N'dbo.solicitudes_cita', N'U') IS NULL
 BEGIN
-    CREATE TABLE dbo.solicitudes (
-        id          INT IDENTITY(1,1) NOT NULL,
-        tipo        NVARCHAR(20)  NOT NULL,
-        nombre      NVARCHAR(120) NULL,
-        telefono    NVARCHAR(20)  NULL,
-        email       NVARCHAR(150) NULL,
-        mascota     NVARCHAR(120) NULL,
-        motivo      NVARCHAR(200) NULL,
-        mensaje     NVARCHAR(1000) NULL,
-        estado      NVARCHAR(20)  NOT NULL
-            CONSTRAINT DF_solicitudes_estado DEFAULT ('Nueva'),
-        creado_en   DATETIME2(0)  NOT NULL
-            CONSTRAINT DF_solicitudes_creado DEFAULT (SYSUTCDATETIME()),
-        CONSTRAINT PK_solicitudes PRIMARY KEY (id),
-        CONSTRAINT CK_solicitudes_tipo
-            CHECK (tipo IN ('cita', 'contacto', 'club')),
-        CONSTRAINT CK_solicitudes_estado
-            CHECK (estado IN ('Nueva', 'Atendida'))
+    CREATE TABLE dbo.solicitudes_cita (
+        id                 INT IDENTITY(1,1) NOT NULL,
+        tipo_mascota       NVARCHAR(20)      NOT NULL,
+        nombre_propietario NVARCHAR(100)     NOT NULL,
+        telefono           NVARCHAR(20)      NOT NULL,
+        nombre_mascota     NVARCHAR(100)     NOT NULL,
+        servicio           NVARCHAR(100)     NOT NULL,
+        fecha_deseada      DATE              NULL,
+        turno              NVARCHAR(50)      NULL,
+        notas              NVARCHAR(500)     NULL,
+        estado             NVARCHAR(20)      NOT NULL CONSTRAINT DF_solicitudes_estado DEFAULT ('Pendiente'),
+        creado_en          DATETIME2(0)      NOT NULL CONSTRAINT DF_solicitudes_creado DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_solicitudes_cita PRIMARY KEY (id)
     );
 END
 GO
 
 IF NOT EXISTS (
     SELECT 1 FROM sys.indexes
-    WHERE name = N'IX_solicitudes_estado'
-      AND object_id = OBJECT_ID(N'dbo.solicitudes')
+    WHERE name = N'IX_solicitudes_creado'
+      AND object_id = OBJECT_ID(N'dbo.solicitudes_cita')
 )
 BEGIN
-    CREATE INDEX IX_solicitudes_estado ON dbo.solicitudes(estado);
+    CREATE INDEX IX_solicitudes_creado ON dbo.solicitudes_cita(creado_en DESC);
 END
 GO
->>>>>>> Stashed changes

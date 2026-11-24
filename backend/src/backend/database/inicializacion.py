@@ -1,20 +1,21 @@
 """Inicialización automática de la base de datos.
 
 Crea (si faltan) la base veterinaria_db, las tablas e índices del esquema
-(usuarios, productos, mascotas, citas, vacunas, historial y pagos) y los
-usuarios de prueba. Es idempotente: se puede ejecutar en cada arranque
-sin duplicar datos ni sobrescribir contraseñas existentes.
+(usuarios, productos, mascotas, citas, vacunas, historial y pagos), los
+usuarios de prueba, el catálogo de productos y datos de demostración.
+Es idempotente: se puede ejecutar en cada arranque sin duplicar datos.
 """
 
 import logging
 import re
+from datetime import date, timedelta
 from pathlib import Path
 
 import pyodbc
 
-from ..core.clinica import DIRECCION_PRINCIPAL, SEDE_PRINCIPAL
 from ..core.config import DB_DRIVER, DB_NAME, DB_SERVER, DB_TIMEOUT
 from ..core.segurity import hash_password
+from .semillas import MASCOTAS_DEMO, PRODUCTOS_SEMILLA
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ USUARIOS_PRUEBA = (
         "telefono": "987654321",
         "dni": "10000001",
         "password": "Admin1234",
+        "rol": "admin",
     },
     {
         "nombres": "Ana",
@@ -36,6 +38,7 @@ USUARIOS_PRUEBA = (
         "telefono": "987654322",
         "dni": "10000002",
         "password": "Clave1234",
+        "rol": "propietario",
     },
     {
         "nombres": "Luis",
@@ -44,6 +47,16 @@ USUARIOS_PRUEBA = (
         "telefono": "987654323",
         "dni": "10000003",
         "password": "Clave1234",
+        "rol": "propietario",
+    },
+    {
+        "nombres": "Mariana",
+        "apellidos": "Pariona",
+        "email": "mariana.pariona@veterinaria.com",
+        "telefono": "987654324",
+        "dni": "10000004",
+        "password": "Vet12345",
+        "rol": "veterinario",
     },
 )
 
@@ -108,8 +121,8 @@ def _insertar_usuarios_prueba(conexion: pyodbc.Connection) -> int:
             cursor.execute(
                 """
                 INSERT INTO dbo.usuarios
-                    (nombres, apellidos, email, telefono, dni, password_hash)
-                VALUES (?, ?, ?, ?, ?, ?)
+                    (nombres, apellidos, email, telefono, dni, password_hash, rol)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 usuario["nombres"],
                 usuario["apellidos"],
@@ -117,6 +130,7 @@ def _insertar_usuarios_prueba(conexion: pyodbc.Connection) -> int:
                 usuario["telefono"],
                 usuario["dni"],
                 hash_password(usuario["password"]),
+                usuario["rol"],
             )
             insertados += 1
         except pyodbc.IntegrityError:
@@ -128,8 +142,6 @@ def _insertar_usuarios_prueba(conexion: pyodbc.Connection) -> int:
     return insertados
 
 
-<<<<<<< Updated upstream
-=======
 def _asignar_roles(conexion: pyodbc.Connection) -> None:
     """Corrige el rol de los usuarios de prueba ya existentes.
 
@@ -337,8 +349,8 @@ def _insertar_demo(conexion: pyodbc.Connection) -> bool:
                 "Medicina General",
                 cita[3],
                 cita[4],
-                SEDE_PRINCIPAL,
-                DIRECCION_PRINCIPAL,
+                "Sede Central - San Carlos",
+                "Av. Francisco Solano 640, Huancayo",
             )
         finally:
             cursor.close()
@@ -424,7 +436,6 @@ def _insertar_demo(conexion: pyodbc.Connection) -> bool:
     return True
 
 
->>>>>>> Stashed changes
 def _crear_base_si_no_existe(conexion: pyodbc.Connection, base: str) -> None:
     cursor = conexion.cursor()
 
@@ -470,6 +481,16 @@ def inicializar_base_datos() -> int:
 
     try:
         _ejecutar_bloques(conexion, sql)
-        return _insertar_usuarios_prueba(conexion)
+        insertados = _insertar_usuarios_prueba(conexion)
+        _asignar_roles(conexion)
+        productos = _insertar_productos(conexion)
+        demo = _insertar_demo(conexion)
+        logger.info(
+            "Semillas: %s usuarios, %s productos, demo=%s",
+            insertados,
+            productos,
+            demo,
+        )
+        return insertados
     finally:
         conexion.close()
