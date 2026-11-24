@@ -150,6 +150,58 @@ class UsuarioResponse(BaseModel):
     email: EmailStr
     telefono: str
     dni: str
+    rol: str = "propietario"
+
+
+# 3.1 Actualización del perfil del usuario autenticado
+class UsuarioActualizar(BaseModel):
+    nombres: str = Field(min_length=2, max_length=100)
+    apellidos: str = Field(min_length=2, max_length=100)
+    email: EmailStr
+    telefono: str = Field(min_length=9, max_length=9)
+
+    @field_validator("nombres", "apellidos", mode="before")
+    @classmethod
+    def validar_nombres(cls, valor, info: ValidationInfo):
+        valor = _limpiar_texto(valor)
+
+        if not isinstance(valor, str):
+            return valor
+
+        etiqueta = "El nombre" if info.field_name == "nombres" else "El apellido"
+
+        if len(valor) < 2:
+            raise ValueError(f"{etiqueta} debe tener al menos 2 caracteres")
+        if len(valor) > 100:
+            raise ValueError(f"{etiqueta} no debe superar los 100 caracteres")
+        if not PATRON_NOMBRES.match(valor):
+            raise ValueError(f"{etiqueta} solo debe contener letras y espacios")
+
+        return valor
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def normalizar_email(cls, valor):
+        valor = _normalizar_email(valor)
+
+        if isinstance(valor, str) and not PATRON_EMAIL.match(valor):
+            raise ValueError(
+                'Ingresa un correo electrónico válido. Debe incluir "@" y un dominio.'
+            )
+
+        return valor
+
+    @field_validator("telefono", mode="before")
+    @classmethod
+    def validar_telefono(cls, valor):
+        valor = _limpiar_texto(valor)
+
+        if isinstance(valor, str) and not PATRON_TELEFONO.match(valor):
+            raise ValueError(
+                "El teléfono debe tener exactamente 9 dígitos y empezar con 9"
+            )
+
+        return valor
 
 
 # 4. Respuesta del login: token + datos públicos del usuario

@@ -21,6 +21,7 @@ from ..schemas.usuario_esquema import (
     RecuperarPasswordSolicitud,
     RestablecerPassword,
     TokenResponse,
+    UsuarioActualizar,
     UsuarioLogin,
     UsuarioRegistro,
     UsuarioResponse,
@@ -86,7 +87,7 @@ class UsuarioService:
                 usuario.id, hash_password(datos_login.password)
             )
 
-        token = crear_token_acceso(usuario.id, usuario.email)
+        token = crear_token_acceso(usuario.id, usuario.email, usuario.rol)
 
         return TokenResponse(
             access_token=token,
@@ -105,6 +106,26 @@ class UsuarioService:
             )
 
         return usuario
+
+    def actualizar_perfil(
+        self, usuario: Usuario, datos: UsuarioActualizar
+    ) -> Usuario:
+        """Actualiza los datos personales del usuario autenticado."""
+        existente = self.usuario_repositorio.obtener_usuario_por_email(datos.email)
+
+        if existente and existente.id != usuario.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El correo electrónico ya está registrado por otra cuenta",
+            )
+
+        return self.usuario_repositorio.actualizar_usuario(
+            usuario.id,
+            datos.nombres,
+            datos.apellidos,
+            datos.email,
+            datos.telefono,
+        )
 
     def solicitar_recuperacion(
         self, datos: RecuperarPasswordSolicitud

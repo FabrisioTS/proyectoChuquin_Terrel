@@ -16,7 +16,7 @@
         <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total pagado</span>
-                <span class="text-lg">✅</span>
+                <span class="icono-material text-lg" aria-hidden="true">check_circle</span>
             </div>
             <p class="mt-2 text-2xl font-black text-emerald-600">{{ formatearMoneda(totalPagado()) }}</p>
             <p class="text-[11px] text-slate-400">Pagos confirmados</p>
@@ -24,7 +24,7 @@
         <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Saldo pendiente</span>
-                <span class="text-lg">⏳</span>
+                <span class="icono-material text-lg" aria-hidden="true">hourglass_top</span>
             </div>
             <p class="mt-2 text-2xl font-black text-amber-600">{{ formatearMoneda(totalPendiente()) }}</p>
             <p class="text-[11px] text-slate-400">Pagos por regularizar</p>
@@ -32,7 +32,7 @@
         <article class="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Comprobantes</span>
-                <span class="text-lg">🧾</span>
+                <span class="icono-material text-lg" aria-hidden="true">receipt_long</span>
             </div>
             <p class="mt-2 text-2xl font-black text-slate-900">{{ cantidad() }}</p>
             <p class="text-[11px] text-slate-400">Documentos emitidos</p>

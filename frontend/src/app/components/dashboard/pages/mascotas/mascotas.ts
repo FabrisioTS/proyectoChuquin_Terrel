@@ -105,15 +105,15 @@ export class Mascotas {
 
         const id = this.editandoId();
 
-        if (id !== null) {
-            this.mascotasService.actualizar(id, datos);
-        } else {
-            this.mascotasService.crear(datos);
-        }
-
-        this.cerrarFormulario();
-
         try {
+            if (id !== null) {
+                await this.mascotasService.actualizar(id, datos);
+            } else {
+                await this.mascotasService.crear(datos);
+            }
+
+            this.cerrarFormulario();
+
             const { default: Swal } = await import('sweetalert2');
             await Swal.fire({
                 icon: 'success',
@@ -121,8 +121,8 @@ export class Mascotas {
                 text: 'La información se guardó correctamente.',
                 confirmButtonColor: '#c2410c',
             });
-        } catch {
-            // Sin modal, el cambio ya quedó guardado.
+        } catch (error) {
+            await this.mostrarError(error);
         }
     }
 
@@ -143,14 +143,28 @@ export class Mascotas {
                 return;
             }
 
-            this.mascotasService.eliminar(mascota.id);
+            await this.mascotasService.eliminar(mascota.id);
             await Swal.fire({
                 icon: 'success',
                 title: 'Mascota eliminada',
                 confirmButtonColor: '#c2410c',
             });
+        } catch (error) {
+            await this.mostrarError(error);
+        }
+    }
+
+    private async mostrarError(error: unknown): Promise<void> {
+        try {
+            const { default: Swal } = await import('sweetalert2');
+            await Swal.fire({
+                icon: 'error',
+                title: 'No se pudo completar la operación',
+                text: (error as Error).message,
+                confirmButtonColor: '#c2410c',
+            });
         } catch {
-            this.mascotasService.eliminar(mascota.id);
+            // Sin modal no se puede informar el error.
         }
     }
 }

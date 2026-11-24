@@ -110,34 +110,43 @@ export class Citas {
         const valor = this.formulario.getRawValue();
         const id = this.editandoId();
 
-        if (id !== null) {
-            this.citasService.reprogramar(id, valor.fecha ?? '', valor.hora ?? '');
+        try {
+            if (id !== null) {
+                await this.citasService.reprogramar(id, valor.fecha ?? '', valor.hora ?? '');
+                this.cerrarFormulario();
+                await this.mostrarExito('Cita reprogramada', 'El turno quedó pendiente de confirmación.');
+                return;
+            }
+
+            const mascota = this.mascotasService.obtener(Number(valor.mascotaId));
+
+            if (!mascota) {
+                await this.mostrarError('Selecciona una mascota válida.');
+                return;
+            }
+
+            const datos: CitaFormulario = {
+                mascotaId: mascota.id,
+                motivo: (valor.motivo ?? '').trim(),
+                doctor: (valor.doctor ?? '').trim(),
+                fecha: valor.fecha ?? this.hoy,
+                hora: valor.hora ?? '10:00',
+            };
+
+            await this.citasService.crear(datos, mascota.nombre);
             this.cerrarFormulario();
-            await this.mostrarExito('Cita reprogramada', 'El turno quedó pendiente de confirmación.');
-            return;
+            await this.mostrarExito('Cita solicitada', 'Tu turno quedó registrado como pendiente.');
+        } catch (error) {
+            await this.mostrarError((error as Error).message);
         }
-
-        const mascota = this.mascotasService.obtener(Number(valor.mascotaId));
-
-        if (!mascota) {
-            return;
-        }
-
-        const datos: CitaFormulario = {
-            mascotaId: mascota.id,
-            motivo: (valor.motivo ?? '').trim(),
-            doctor: (valor.doctor ?? '').trim(),
-            fecha: valor.fecha ?? this.hoy,
-            hora: valor.hora ?? '10:00',
-        };
-
-        this.citasService.crear(datos, mascota.nombre);
-        this.cerrarFormulario();
-        await this.mostrarExito('Cita solicitada', 'Tu turno quedó registrado como pendiente.');
     }
 
-    confirmar(cita: Cita): void {
-        this.citasService.confirmar(cita.id);
+    async confirmar(cita: Cita): Promise<void> {
+        try {
+            await this.citasService.confirmar(cita.id);
+        } catch (error) {
+            await this.mostrarError((error as Error).message);
+        }
     }
 
     async cancelar(cita: Cita): Promise<void> {
@@ -160,7 +169,11 @@ export class Citas {
             // Sin modal, se cancela directamente.
         }
 
-        this.citasService.cancelar(cita.id);
+        try {
+            await this.citasService.cancelar(cita.id);
+        } catch (error) {
+            await this.mostrarError((error as Error).message);
+        }
     }
 
     cambiarFiltro(filtro: FiltroCitas): void {
@@ -194,6 +207,20 @@ export class Citas {
             });
         } catch {
             // El cambio ya quedó guardado.
+        }
+    }
+
+    private async mostrarError(mensaje: string): Promise<void> {
+        try {
+            const { default: Swal } = await import('sweetalert2');
+            await Swal.fire({
+                icon: 'error',
+                title: 'No se pudo completar la operación',
+                text: mensaje,
+                confirmButtonColor: '#c2410c',
+            });
+        } catch {
+            // Sin modal no se puede informar el error.
         }
     }
 }

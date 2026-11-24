@@ -94,8 +94,22 @@ export class Pagos {
         URL.revokeObjectURL(url);
     }
 
-    marcarPagado(pago: Pago): void {
-        this.pagosService.marcarPagado(pago.id);
+    async marcarPagado(pago: Pago): Promise<void> {
+        try {
+            await this.pagosService.marcarPagado(pago.id);
+        } catch (error) {
+            try {
+                const { default: Swal } = await import('sweetalert2');
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo registrar el pago',
+                    text: (error as Error).message,
+                    confirmButtonColor: '#c2410c',
+                });
+            } catch {
+                // Sin modal no se puede informar el error.
+            }
+        }
     }
 
     claseEstado(estado: EstadoPago): string {

@@ -1,0 +1,111 @@
+<!-- CARRUSEL AUTOMÁTICO DE PACIENTES -->
+<section id="galeria" class="relative overflow-hidden bg-slate-50 py-20">
+
+    <!-- Resplandores decorativos -->
+    <div
+        class="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-brand-100/70 blur-3xl">
+    </div>
+    <div
+        class="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-accent-100/70 blur-3xl">
+    </div>
+
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        <div class="mx-auto mb-12 max-w-3xl space-y-3 text-center">
+            <span
+                class="inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-brand-700">
+                <span class="icono-material" aria-hidden="true">photo_camera</span> Nuestros pacientes
+            </span>
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Perros y gatos que confían en nosotros
+            </h2>
+            <p class="text-sm leading-relaxed text-slate-600 sm:text-base">
+                Un recorrido por algunas de las mascotas que han pasado por nuestra clínica.
+            </p>
+        </div>
+
+        <div class="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-2xl shadow-slate-900/25"
+            (mouseenter)="pausar()" (mouseleave)="reanudar()" (focusin)="pausar()" (focusout)="reanudar()"
+            aria-roledescription="carrusel" aria-label="Galería de mascotas atendidas">
+
+            <div class="relative h-[340px] overflow-hidden sm:h-[440px] lg:h-[540px]">
+
+                <!-- Pista deslizante -->
+                <div class="flex h-full"
+                    [class.transition-transform]="!sinTransicion()"
+                    [class.duration-700]="!sinTransicion()"
+                    [class.ease-in-out]="!sinTransicion()"
+                    [style.transform]="'translateX(-' + indice() * 100 + '%)'">
+
+                    @for (foto of slides; track $index) {
+                    <div class="relative h-full w-full shrink-0">
+                        <!-- Fondo difuminado para rellenar los laterales -->
+                        <img [src]="foto.src" alt="" aria-hidden="true"
+                            class="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl" />
+
+                        <!-- Fotografía completa -->
+                        <img [src]="foto.src" [alt]="foto.alt"
+                            [attr.loading]="$index === 0 ? 'eager' : 'lazy'"
+                            class="relative h-full w-full object-contain drop-shadow-2xl" />
+
+                        <div
+                            class="pointer-events-none absolute inset-0 bg-linear-to-t from-slate-950/85 via-slate-950/10 to-transparent">
+                        </div>
+
+                        <div class="absolute inset-x-0 bottom-0 p-6 pb-16 sm:p-8 sm:pb-16">
+                            <p class="text-[11px] font-bold uppercase tracking-widest text-brand-300">
+                                {{ foto.etiqueta }}
+                            </p>
+                            <p class="mt-1 text-lg font-extrabold text-white sm:text-xl">{{ foto.titulo }}</p>
+                        </div>
+                    </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- Contador -->
+            <div
+                class="absolute right-4 top-4 z-10 rounded-full bg-slate-950/50 px-3 py-1 text-[11px] font-bold text-white backdrop-blur sm:right-6 sm:top-6">
+                {{ (indice() % fotos.length) + 1 }} / {{ fotos.length }}
+            </div>
+
+            <!-- Botón anterior -->
+            <button type="button" (click)="anterior()" aria-label="Ver imagen anterior"
+                class="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-slate-950/40 text-white backdrop-blur transition-colors hover:bg-brand-600 sm:left-5 sm:h-11 sm:w-11">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
+                        d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+
+            <!-- Botón siguiente -->
+            <button type="button" (click)="siguiente()" aria-label="Ver imagen siguiente"
+                class="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-slate-950/40 text-white backdrop-blur transition-colors hover:bg-brand-600 sm:right-5 sm:h-11 sm:w-11">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"
+                        d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+
+            <!-- Indicadores -->
+            <div class="absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2 sm:bottom-6">
+                @for (foto of fotos; track foto.src; let i = $index) {
+                <button type="button" (click)="irA(i)" [attr.aria-label]="'Ir a la imagen ' + (i + 1)"
+                    [attr.aria-current]="indice() % fotos.length === i ? 'true' : null"
+                    class="h-2 rounded-full transition-all duration-300"
+                    [class]="indice() % fotos.length === i
+                        ? 'w-8 bg-brand-500'
+                        : 'w-2 bg-white/60 hover:bg-white'"></button>
+                }
+            </div>
+
+            <!-- Anuncio para lectores de pantalla -->
+            <p class="sr-only" aria-live="polite">
+                Imagen {{ (indice() % fotos.length) + 1 }} de {{ fotos.length }}:
+                {{ fotos[indice() % fotos.length].titulo }}
+            </p>
+        </div>
+
+    </div>
+</section>

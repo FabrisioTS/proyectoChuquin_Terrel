@@ -12,3 +12,4 @@ class Usuario:
     telefono: str
     dni: str
     password_hash: str
+    rol: str = "propietario"

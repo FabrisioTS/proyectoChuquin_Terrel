@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AutenticacionService } from '../../../../services/autenticacion-service';
@@ -18,10 +18,7 @@ export class Configuracion {
     private fb = inject(FormBuilder);
 
     readonly usuario = this.autenticacionService.usuarioActual;
-    readonly sedes = [
-        'Sede Central - San Carlos',
-,
-    ];
+    readonly sedes = ['Sede Central - San Carlos'];
 
     readonly formulario = this.fb.group({
         nombres: ['', Validators.required],
@@ -29,7 +26,7 @@ export class Configuracion {
         email: ['', [Validators.required, Validators.email]],
         telefono: [''],
         dni: [''],
-        sede: ['Sede Central San Carlos', Validators.required],
+        sede: [this.sedes[0], Validators.required],
         notificacionesCitas: [true],
         notificacionesVacunas: [true],
         notificacionesPagos: [false],
@@ -53,23 +50,31 @@ export class Configuracion {
     mostrarPasswordNueva = false;
     mostrarPasswordConfirmacion = false;
     cambiandoPassword = false;
+    guardando = false;
     errorPassword: string | null = null;
     exitoPassword: string | null = null;
 
     constructor() {
-        const usuario = this.autenticacionService.usuarioActual();
-        const configuracion = this.configuracionService.configuracion();
+        // El formulario se sincroniza con los datos que llegan del backend,
+        // tanto al cargar la página como después de guardar los cambios.
+        effect(() => {
+            const usuario = this.autenticacionService.usuarioActual();
+            const configuracion = this.configuracionService.configuracion();
 
-        this.formulario.patchValue({
-            nombres: usuario?.nombres ?? configuracion.nombres,
-            apellidos: usuario?.apellidos ?? configuracion.apellidos,
-            email: usuario?.email ?? configuracion.email,
-            telefono: usuario?.telefono ?? configuracion.telefono,
-            dni: usuario?.dni ?? configuracion.dni,
-            sede: configuracion.sede,
-            notificacionesCitas: configuracion.notificacionesCitas,
-            notificacionesVacunas: configuracion.notificacionesVacunas,
-            notificacionesPagos: configuracion.notificacionesPagos,
+            this.formulario.patchValue(
+                {
+                    nombres: usuario?.nombres ?? configuracion.nombres,
+                    apellidos: usuario?.apellidos ?? configuracion.apellidos,
+                    email: usuario?.email ?? configuracion.email,
+                    telefono: usuario?.telefono ?? configuracion.telefono,
+                    dni: usuario?.dni ?? configuracion.dni,
+                    sede: configuracion.sede || this.sedes[0],
+                    notificacionesCitas: configuracion.notificacionesCitas,
+                    notificacionesVacunas: configuracion.notificacionesVacunas,
+                    notificacionesPagos: configuracion.notificacionesPagos,
+                },
+                { emitEvent: false },
+            );
         });
     }
 
@@ -92,16 +97,11 @@ export class Configuracion {
             notificacionesPagos: Boolean(valor.notificacionesPagos),
         };
 
-        this.configuracionService.guardar(configuracion);
-        this.autenticacionService.actualizarPerfilLocal({
-            nombres: configuracion.nombres,
-            apellidos: configuracion.apellidos,
-            email: configuracion.email,
-            telefono: configuracion.telefono,
-            dni: configuracion.dni,
-        });
+        this.guardando = true;
 
         try {
+            await this.configuracionService.guardar(configuracion);
+
             const { default: Swal } = await import('sweetalert2');
             await Swal.fire({
                 icon: 'success',
@@ -109,8 +109,20 @@ export class Configuracion {
                 text: 'Tus datos y preferencias se actualizaron correctamente.',
                 confirmButtonColor: '#c2410c',
             });
-        } catch {
-            // Los cambios ya quedaron guardados.
+        } catch (error) {
+            try {
+                const { default: Swal } = await import('sweetalert2');
+                await Swal.fire({
+                    icon: 'error',
+                    title: 'No se pudo guardar la configuración',
+                    text: (error as Error).message,
+                    confirmButtonColor: '#c2410c',
+                });
+            } catch {
+                // Sin modal no se puede informar el error.
+            }
+        } finally {
+            this.guardando = false;
         }
     }
 

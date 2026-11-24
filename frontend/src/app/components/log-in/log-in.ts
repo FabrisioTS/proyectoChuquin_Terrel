@@ -70,14 +70,14 @@ export class LogIn {
             icon: 'success',
             title: `Bienvenido, ${respuesta.usuario.nombres}`,
             text: 'Has iniciado sesión correctamente.',
-            confirmButtonText: 'Ir al dashboard',
+            confirmButtonText: 'Continuar',
             confirmButtonColor: '#c2410c',
           });
         } catch {
-          // Si el modal falla, no se bloquea el acceso al dashboard.
+          // Si el modal falla, no se bloquea el acceso al portal.
         }
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([this.autenticacionService.rutaInicio()]);
       },
       error: (err: Error) => {
         this.cargando.set(false);

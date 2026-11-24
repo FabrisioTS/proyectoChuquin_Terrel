@@ -55,7 +55,7 @@ export const REGLAS_LIBRO_RECLAMACIONES: SeccionLegal[] = [
         titulo: '7. Confidencialidad y contacto',
         parrafos: [
             'Los datos registrados se utilizan únicamente para gestionar el reclamo o queja y se conservan conforme a la normativa de protección de datos personales.',
-            'Para consultas adicionales puede escribir a citas@clinicapariona.com o llamar al +51 999 888 777. Atención administrativa: lunes a sábado de 8:00 a 20:00 horas.',
+            'Para consultas adicionales puede escribir a citas@clinicapariona.com o llamar al +51 914 821 538. Atención administrativa: lunes a sábado de 8:00 a 20:00 horas.',
         ],
     },
 ];
@@ -116,7 +116,7 @@ export const TERMINOS_CONDICIONES: SeccionLegal[] = [
     {
         titulo: '8. Contacto',
         parrafos: [
-            'Para consultas sobre estos términos, el usuario puede escribir a citas@clinicapariona.com o llamar al +51 999 888 777.',
+            'Para consultas sobre estos términos, el usuario puede escribir a citas@clinicapariona.com o llamar al +51 914 821 538.',
         ],
     },
 ];
@@ -128,7 +128,7 @@ export const POLITICA_PRIVACIDAD: SeccionLegal[] = [
     {
         titulo: '1. Responsable del tratamiento',
         parrafos: [
-            'Clínica Pariona es responsable de los datos personales registrados en su portal. La sede principal se encuentra en Av. Principal 123, Miraflores, Lima, Perú.',
+            'Clínica Pariona es responsable de los datos personales registrados en su portal. La sede principal se encuentra en Av. Francisco Solano 640, San Carlos, Huancayo, Junín, Perú.',
         ],
     },
     {
